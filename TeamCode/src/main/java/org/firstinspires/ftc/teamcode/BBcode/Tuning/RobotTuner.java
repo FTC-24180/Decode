@@ -17,15 +17,15 @@ public class RobotTuner extends OpMode {
 
     @Override
     public void init() {
-        motors[0] = hardwareMap.get(DcMotorEx.class, "launcher");
-        motors[1] = hardwareMap.get(DcMotorEx.class, "transfer");
-        motors[2] = hardwareMap.get(DcMotorEx.class, "intake");
+        motors[0] = hardwareMap.tryGet(DcMotorEx.class, "launcher");
+        motors[1] = hardwareMap.tryGet(DcMotorEx.class, "transfer");
+        motors[2] = hardwareMap.tryGet(DcMotorEx.class, "intake");
         for (DcMotorEx motor: motors) {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
-        leftInserter = hardwareMap.get(CRServo.class, "leftInserter");
-        rightInserter = hardwareMap.get(CRServo.class, "rightInserter");
+        leftInserter = hardwareMap.tryGet(CRServo.class, "leftInserter");
+        rightInserter = hardwareMap.tryGet(CRServo.class, "rightInserter");
     }
 
     @Override
@@ -48,20 +48,24 @@ public class RobotTuner extends OpMode {
         if (gamepad1.yWasPressed()) {
             isActive = true;
         }
-        if (gamepad1.xWasPressed()) {
-            leftInserter.setPower(requestedPower);
-            rightInserter.setPower(-requestedPower);
-        }
-        if (gamepad1.bWasPressed()) {
-            leftInserter.setPower(0);
-            rightInserter.setPower(0);
+        if (leftInserter == null || rightInserter == null) {
+            if (gamepad1.xWasPressed()) {
+                leftInserter.setPower(requestedPower);
+                rightInserter.setPower(-requestedPower);
+            }
+            if (gamepad1.bWasPressed()) {
+                leftInserter.setPower(0);
+                rightInserter.setPower(0);
+            }
         }
 
 
-        if (isActive) {
-            motors[selectedMotor].setPower(requestedPower);
-        } else {
-            motors[selectedMotor].setPower(0);
+        if (motors[selectedMotor] == null) {
+            if (isActive) {
+                motors[selectedMotor].setPower(requestedPower);
+            } else {
+                motors[selectedMotor].setPower(0);
+            }
         }
         telemetry.addData("Selected motor power", motors[selectedMotor].getPower());
         telemetry.update();
