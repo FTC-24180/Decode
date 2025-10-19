@@ -13,7 +13,7 @@ public class RobotTuner extends OpMode {
     CRServo rightInserter;
     DcMotorEx[] motors = new DcMotorEx[3];
     int selectedMotor = 0;
-    double requestedPower = 0;
+    double requestedVelocity = 0;
     boolean isActive = false;
 
     @Override
@@ -41,10 +41,16 @@ public class RobotTuner extends OpMode {
             isActive = false;
         }
         if (gamepad1.dpadUpWasPressed()) {
-            requestedPower = Math.min(requestedPower + 0.1, 1);
+            requestedVelocity = Math.min(requestedVelocity + 10, 3000);
+            if (gamepad1.right_trigger > 0) {
+                requestedVelocity = Math.min(requestedVelocity + 100, 3000);
+            }
         }
         if (gamepad1.dpadDownWasPressed()) {
-            requestedPower = Math.max(requestedPower - 0.1, 0);
+            requestedVelocity = Math.max(requestedVelocity - 10, 0);
+            if (gamepad1.right_trigger > 0) {
+                requestedVelocity = Math.max(requestedVelocity - 100, 0);
+            }
         }
         if (gamepad1.aWasPressed()) {
             isActive = false;
@@ -66,17 +72,18 @@ public class RobotTuner extends OpMode {
 
         if (motors[selectedMotor] != null) {
             if (isActive) {
-                motors[selectedMotor].setPower(requestedPower);
+                motors[selectedMotor].setVelocity(requestedVelocity);
             } else {
-                motors[selectedMotor].setPower(0);
+                motors[selectedMotor].setVelocity(0);
             }
         } else {
             telemetry.addLine("Selected motor can not be found");
         }
         telemetry.addData("Current Motor", selectedMotor);
-        telemetry.addData("Requested power", requestedPower);
-        telemetry.addData("Selected motor power", motors[selectedMotor].getPower());
+        telemetry.addData("Requested velocity", requestedVelocity);
+        telemetry.addData("Selected motor velocity", motors[selectedMotor].getVelocity());
         telemetry.addData("Selected motor is active", isActive);
+        telemetry.addData("Encoder is active", motors[selectedMotor].getCurrentPosition() != 0);
         telemetry.update();
     }
 }
