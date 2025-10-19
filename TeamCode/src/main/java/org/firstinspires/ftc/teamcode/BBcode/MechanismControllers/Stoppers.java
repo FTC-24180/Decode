@@ -1,21 +1,22 @@
 package org.firstinspires.ftc.teamcode.BBcode.MechanismControllers;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.CRServo;
 
 public class Stoppers {
     OpMode _opMode;
-    Servo _rightStopper;
-    Servo _leftStopper;
+    CRServo _rightInserter;
+    CRServo _leftInserter;
     public Stoppers (OpMode opMode)
     {
         _opMode = opMode;
-        _rightStopper = _opMode.hardwareMap.tryGet(Servo.class, "rightStopper");
-        _leftStopper = _opMode.hardwareMap.tryGet(Servo.class, "leftStopper");
+        _rightInserter = _opMode.hardwareMap.tryGet(CRServo.class, "rightInserter");
+        _leftInserter = _opMode.hardwareMap.tryGet(CRServo.class, "leftInserter");
     }
     //-----------------------------------------
     //Variable Storage:
-    double transferUp = 0.75;
+    double transferUp = 1;
+    double stopped = 0;
 
     //-----------------------------------------
 
@@ -23,22 +24,26 @@ public class Stoppers {
         rightStopperCustom(transferUp);
         leftStopperCustom(transferUp);
     }
-    public void rightStopperCustom(double time)
+    public void stopped() {
+        rightStopperCustom(stopped);
+        leftStopperCustom(stopped);
+    }
+    public void rightStopperCustom(double power)
     {
-        if (_rightStopper == null)
+        if (_rightInserter == null)
         {
-            _opMode.telemetry.addLine("rightStopper Servo not found!");
+            _opMode.telemetry.addLine("rightInserter Servo not found!");
         } else {
-            _rightStopper.setPosition(time);
+            _rightInserter.setPower(power);
         }
     }
-    public void leftStopperCustom(double time)
+    public void leftStopperCustom(double power)
     {
-        if (_leftStopper == null)
+        if (_leftInserter == null)
         {
-            _opMode.telemetry.addLine("leftStopper Servo not found!");
+            _opMode.telemetry.addLine("leftInserter Servo not found!");
         } else {
-            _leftStopper.setPosition(time);
+            _leftInserter.setPower(-power);
         }
     }
 }
