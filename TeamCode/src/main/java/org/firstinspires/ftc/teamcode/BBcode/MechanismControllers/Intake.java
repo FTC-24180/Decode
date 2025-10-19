@@ -13,7 +13,7 @@ public class Intake {
     }
     //-----------------------------------------
     //Variable Storage:
-    double intaking = 0.75;
+    double intaking = 0.25;
     double stopped = 0;
 
     //-----------------------------------------
