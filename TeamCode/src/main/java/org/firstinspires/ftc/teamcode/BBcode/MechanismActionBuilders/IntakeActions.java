@@ -9,31 +9,31 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Intake;
 
 public class IntakeActions {
-    Intake _Intake;
+    Intake intake;
 
     public IntakeActions(OpMode opMode) {
-        _Intake = new Intake(opMode);
+        intake = new Intake(opMode);
     }
 
-    public class StoppedAction implements Action {
+    public class stopAction implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            _Intake.Stopped();
+            intake.stop();
             return false;
         }
     }
-    public Action IntakeStopped() {
-        return new StoppedAction();
+    public Action stop() {
+        return new stopAction();
     }
 
-    public class SpinningAction implements Action {
+    public class intakeAction implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            _Intake.IntakingArtifacts();
+            intake.intakeArtifacts();
             return false;
         }
     }
-    public Action IntakeSpinning() {
-        return new SpinningAction();
+    public Action intake() {
+        return new intakeAction();
     }
 }

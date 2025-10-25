@@ -4,46 +4,38 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.CRServo;
 
 public class Stoppers {
-    OpMode _opMode;
-    CRServo _rightInserter;
-    CRServo _leftInserter;
+    OpMode opMode;
+    CRServo rightInserter;
+    CRServo leftInserter;
     public Stoppers (OpMode opMode)
     {
-        _opMode = opMode;
-        _rightInserter = _opMode.hardwareMap.tryGet(CRServo.class, "rightInserter");
-        _leftInserter = _opMode.hardwareMap.tryGet(CRServo.class, "leftInserter");
+        this.opMode = opMode;
+        rightInserter = this.opMode.hardwareMap.tryGet(CRServo.class, "rightInserter");
+        leftInserter = this.opMode.hardwareMap.tryGet(CRServo.class, "leftInserter");
     }
     //-----------------------------------------
-    //Variable Storage:
-    double transferUp = 1;
-    double stopped = 0;
+    // Constants
+    final double TRANSFER_POWER = 1;
+    final double STOPED_POWER = 0;
 
     //-----------------------------------------
 
-    public void tranferUpForShot() {
-        rightStopperCustom(transferUp);
-        leftStopperCustom(transferUp);
+    public void transfer() {
+        setPower(TRANSFER_POWER);
     }
-    public void stopped() {
-        rightStopperCustom(stopped);
-        leftStopperCustom(stopped);
+    public void stop() {
+        setPower(STOPED_POWER);
     }
-    public void rightStopperCustom(double power)
+    public void setPower(double power)
     {
-        if (_rightInserter == null)
+        if (rightInserter == null)
         {
-            _opMode.telemetry.addLine("rightInserter Servo not found!");
+            opMode.telemetry.addLine("rightInserter Servo not found!");
+        } else if (leftInserter == null) {
+            opMode.telemetry.addLine("leftInserter Servo not found!");
         } else {
-            _rightInserter.setPower(power);
-        }
-    }
-    public void leftStopperCustom(double power)
-    {
-        if (_leftInserter == null)
-        {
-            _opMode.telemetry.addLine("leftInserter Servo not found!");
-        } else {
-            _leftInserter.setPower(-power);
+            rightInserter.setPower(-power);
+            leftInserter.setPower(power);
         }
     }
 }

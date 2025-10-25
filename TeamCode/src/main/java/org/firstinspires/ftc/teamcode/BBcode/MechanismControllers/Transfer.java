@@ -4,33 +4,35 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
 public class Transfer {
-    OpMode _opMode;
-    DcMotorEx _tranfer;
+    OpMode opMode;
+    DcMotorEx transfer;
     public Transfer (OpMode opMode)
     {
-        _opMode = opMode;
-        _tranfer = _opMode.hardwareMap.tryGet(DcMotorEx.class, "tranfer");
+        this.opMode = opMode;
+        transfer = this.opMode.hardwareMap.tryGet(DcMotorEx.class, "transfer");
     }
     //-----------------------------------------
-    //Variable Storage:
-    double transfering = 0.75;
-    double stopped = 0;
+    // Constants
+    final double TRANSFER_VELOCITY = 1;
+    final double STOPPED_VELOCITY = 0;
+    final double RPS_TO_TPS = 103.8;
 
     //-----------------------------------------
 
-    public void tranferingToStoppers() {
-        TransferCustom(transfering);
+    public void transfer() {
+        setVelocity(TRANSFER_VELOCITY);
     }
-    public void stopped() {
-        TransferCustom(stopped);
+    public void stop() {
+        setVelocity(STOPPED_VELOCITY);
     }
-    public void TransferCustom(double power)
+    public void setVelocity(double rps)
     {
-        if (_tranfer == null)
+        if (transfer == null)
         {
-            _opMode.telemetry.addLine("Transfer Motor not found!");
+            opMode.telemetry.addLine("Transfer Motor not found!");
         } else {
-            _tranfer.setPower(power);
+            double tps = rps * RPS_TO_TPS;
+            transfer.setVelocity(tps);
         }
     }
 }

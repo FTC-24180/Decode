@@ -3,34 +3,37 @@ package org.firstinspires.ftc.teamcode.BBcode.MechanismControllers;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 
-public class Intake {
+public class Launcher {
     OpMode opMode;
-    DcMotorEx intake;
-    public Intake (OpMode opMode)
+    DcMotorEx launcher;
+    public Launcher(OpMode opMode)
     {
         this.opMode = opMode;
-        intake = this.opMode.hardwareMap.tryGet(DcMotorEx.class, "intake");
+        launcher = this.opMode.hardwareMap.tryGet(DcMotorEx.class, "launcher");
     }
     //-----------------------------------------
     // Constants
-    final double INTAKE_VELOCITY = 2; // Motor speed while intaking. Unit RPS
-    final double STOPED_VELOCITY = 0; // Motor speed while stoped. Unit RPS
+    final double STOPPED_VELOCITY = 0;
+
     final double RPS_TO_TPS = 28;
+
     //-----------------------------------------
-    public void intakeArtifacts() {
-        setVelocity(INTAKE_VELOCITY);
+
+    public void launch() {
+        double rps = 45; // TODO: This value should be calculated based on the range to the goal.
+        setVelocity(rps);
     }
     public void stop() {
-        setVelocity(STOPED_VELOCITY);
+        setVelocity(STOPPED_VELOCITY);
     }
     public void setVelocity(double rps)
     {
-        if (intake == null)
+        if (launcher == null)
         {
             opMode.telemetry.addLine("Transfer Motor not found!");
         } else {
             double tps = rps * RPS_TO_TPS;
-            intake.setVelocity(tps);
+            launcher.setVelocity(tps);
         }
     }
 }

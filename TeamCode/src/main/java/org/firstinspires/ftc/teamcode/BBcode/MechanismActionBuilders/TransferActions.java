@@ -18,7 +18,7 @@ public class TransferActions {
     public class TranferingAction implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            _Transfer.tranferingToStoppers();
+            _Transfer.transfer();
             return false;
         }
     }
@@ -29,7 +29,7 @@ public class TransferActions {
     public class NotTranferingAction implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            _Transfer.stopped();
+            _Transfer.stop();
             return false;
         }
     }
