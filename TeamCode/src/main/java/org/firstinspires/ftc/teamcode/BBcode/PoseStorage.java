@@ -20,5 +20,10 @@ public class PoseStorage {
         }
 
         public static OpModeType previousOpMode = OpModeType.UNKNOWN;
+        public enum Alliance {
+                BLUE,
+                RED
+        }
+        public static Alliance alliance = Alliance.RED;
 
 }

@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.BBcode;
 
 
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
@@ -39,8 +40,7 @@ public class MecanumDrivetrain {
     private static final double kdRotation = 0.1;
     private static final double angleToleranceDeg = 1;
     private static final double distanceToleranceInch = .25;
-    private boolean isDpad_LeftPressed = false;
-    private boolean isDpad_RightPressed = false;
+    private static final double AIM_DRIVE_SPEED = 1;
     public final Localizer localizer;
     ElapsedTime derivativeTimer;
 
@@ -95,37 +95,33 @@ public class MecanumDrivetrain {
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
         if (PoseStorage.hasFieldCentricDrive) {
+            if (gamepad1.left_trigger > 0) {
+                Vector2d goalPosition = new Vector2d(0,0);
+                switch (PoseStorage.alliance) {
+                    case RED:
+                        goalPosition = new Vector2d(-72,-72);
+                        break;
+                    case BLUE:
+                        goalPosition = new Vector2d(72,-72);
+                        break;
+                }
+                double offestX = localizer.getPose().position.x + goalPosition.x;
+                double offsetY = localizer.getPose().position.y + goalPosition.y;
 
-            if (gamepad1.left_bumper) {
-                targetPose = basketDropTargetPose;
-            }
-            if(gamepad1.right_bumper) {
-                targetPose = specimenGrabTargetPose;
-            }
-            if(gamepad1.right_trigger > 0) {
-                targetPose = specimenClipTargetPose;
-            }
-            if(gamepad1.dpad_left) {
-                if (!isDpad_LeftPressed) {
-                    isDpad_LeftPressed = true;
-                    double newX = specimenClipTargetPose.position.x;
-                    newX -= 1;
-                    specimenClipTargetPose = new Pose2d(newX, specimenClipTargetPose.position.y, specimenClipTargetPose.heading.toDouble());
-                }
-            }
-                else {
-                isDpad_LeftPressed = false;
-            }
-            if(gamepad1.dpad_right) {
-                if (!isDpad_RightPressed) {
-                    isDpad_RightPressed = true;
-                    double newX = specimenClipTargetPose.position.x;
-                    newX += 1;
-                    specimenClipTargetPose = new Pose2d(newX, specimenClipTargetPose.position.y, specimenClipTargetPose.heading.toDouble());
-                }
-            }
-            else {
-                isDpad_RightPressed = false;
+                double r = Math.sqrt(Math.pow((offestX), 2) + Math.pow((offsetY), 2));
+                double t = Math.toDegrees(Math.atan(offsetY / offestX));
+
+                double newR = r + (-gamepad1.left_stick_y * AIM_DRIVE_SPEED);
+                double newT = t + (gamepad1.left_stick_x * AIM_DRIVE_SPEED);
+
+                double newOffestX = newR * Math.cos(newT);
+                double newOffsetY = newR * Math.sin(newT);
+
+                double newX = newOffestX - goalPosition.x;
+                double newY = newOffsetY - goalPosition.y;
+
+                targetPose = new Pose2d(new Vector2d(newX, newY), (-Math.signum(newT) * 180) + newT);
+
             }
         }
         if (targetPose == null){
