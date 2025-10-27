@@ -13,6 +13,7 @@ public class Launcher {
     }
     //-----------------------------------------
     // Constants
+    final double IDLE_VELOCITY = 50;
     final double STOPPED_VELOCITY = 0;
 
     final double RPS_TO_TPS = 28;
@@ -22,6 +23,9 @@ public class Launcher {
     public void launch() {
         double rps = 45; // TODO: This value should be calculated based on the range to the goal.
         setVelocity(rps);
+    }
+    public void idle() {
+        setVelocity(IDLE_VELOCITY);
     }
     public void stop() {
         setVelocity(STOPPED_VELOCITY);

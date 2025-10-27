@@ -6,6 +6,7 @@ import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Intake;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Launcher;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Stoppers;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Transfer;
+import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @TeleOp (name = "*Main TeleOp")
 public class Decode_Qualifier1_Teleop extends OpMode {
@@ -13,20 +14,82 @@ public class Decode_Qualifier1_Teleop extends OpMode {
     Launcher launcher;
     Stoppers stoppers;
     Transfer transfer;
+    MecanumDrivetrain drivetrain;
 
     enum State {
-
+        LAUNCHING,
+        AIMING,
+        INTAKING,
+        IDLE
     }
+    State state = State.INTAKING;
     @Override
     public void init() {
         intake = new Intake(this);
         launcher = new Launcher(this);
         stoppers = new Stoppers(this);
         transfer = new Transfer(this);
+        drivetrain = new MecanumDrivetrain(this);
     }
 
     @Override
     public void loop() {
+        switch (state) {
+            case LAUNCHING:
+                intake.intakeArtifacts();
+                launcher.launch();
+                stoppers.transfer();
+                transfer.transfer();
 
+                if (gamepad1.right_trigger == 0) {
+                    state = State.AIMING;
+                }
+                if (gamepad1.backWasPressed()) {
+                    state = State.IDLE;
+                }
+                break;
+            case AIMING:
+                intake.intakeArtifacts();
+                launcher.launch();
+                stoppers.stop();
+                transfer.stop();
+                drivetrain.Drive();
+
+                if (gamepad1.right_trigger > 0) {
+                    state = State.LAUNCHING;
+                }
+                if (gamepad1.left_trigger == 0) {
+                    state = State.INTAKING;
+                }
+                if (gamepad1.backWasPressed()) {
+                    state = State.IDLE;
+                }
+                break;
+            case INTAKING:
+                intake.intakeArtifacts();
+                launcher.idle();
+                stoppers.stop();
+                transfer.stop();
+                drivetrain.Drive();
+
+                if (gamepad1.left_trigger > 0) {
+                    state = State.AIMING;
+                }
+                if (gamepad1.backWasPressed()) {
+                    state = State.IDLE;
+                }
+                break;
+            case IDLE:
+                intake.stop();
+                launcher.stop();
+                stoppers.stop();
+                transfer.stop();
+                drivetrain.Drive();
+
+                if (gamepad1.backWasPressed()) {
+                    state = State.INTAKING;
+                }
+                break;
+        }
     }
 }

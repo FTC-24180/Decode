@@ -68,7 +68,7 @@ public class MecanumDrivetrain {
         } else {
             // Reverse the right side motors
             _rightFront.setDirection(DcMotor.Direction.REVERSE);
-            _rightBack.setDirection(DcMotor.Direction.REVERSE);
+            _leftBack.setDirection(DcMotor.Direction.REVERSE);
         }
         //init derivative timer
         derivativeTimer = new ElapsedTime();
@@ -94,7 +94,7 @@ public class MecanumDrivetrain {
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        if (PoseStorage.hasFieldCentricDrive) {
+        if (false/*PoseStorage.hasFieldCentricDrive*/) {
             if (gamepad1.left_trigger > 0) {
                 Vector2d goalPosition = new Vector2d(0,0);
                 switch (PoseStorage.alliance) {
