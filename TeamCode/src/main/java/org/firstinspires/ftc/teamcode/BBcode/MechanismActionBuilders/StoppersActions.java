@@ -8,10 +8,10 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Stoppers;
 
-public class StoppersAction {
+public class StoppersActions {
     Stoppers stopper;
 
-    public StoppersAction(OpMode opMode) {
+    public StoppersActions(OpMode opMode) {
         stopper = new Stoppers(opMode);
     }
 

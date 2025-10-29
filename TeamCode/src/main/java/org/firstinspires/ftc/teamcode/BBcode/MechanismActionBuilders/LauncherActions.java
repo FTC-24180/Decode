@@ -27,15 +27,42 @@ public class LauncherActions {
         return new stopAction();
     }
 
-    public class launchAction implements Action {
+    public class shortLaunchAction implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            launcher.launch();
+            launcher.shortLaunch();
             return false;
         }
     }
+    public Action shortLaunch() {return new shortLaunchAction();}
 
-    public Action launch() {
-        return new launchAction();
+    public class mediumLaunchAction implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            launcher.mediumLaunch();
+            return false;
+        }
     }
+    public Action mediumLaunch() {return new mediumLaunchAction();}
+
+    public class longLaunchAction implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            launcher.longLaunch();
+            return false;
+        }
+    }
+    public Action longLaunch() {return new longLaunchAction();}
+//
+//    public class launchAction implements Action {
+//        @Override
+//        public boolean run(@NonNull TelemetryPacket packet) {
+//            launcher.launch();
+//            return false;
+//        }
+//    }
+//
+//    public Action launch() {
+//        return new launchAction();
+//   }
 }
