@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
 //@Disabled
-@Autonomous(name = "Red_Side_No_Spike_Marks", group = "Autonomous")
+@Autonomous(name = "Red_Side_Close", group = "Autonomous")
 public class Red_Side_Close extends LinearOpMode {
 
     @Override
@@ -59,7 +59,7 @@ public class Red_Side_Close extends LinearOpMode {
                 .build();
 
         Action driveToIntake = drive.actionBuilder(new Pose2d(-12,30,Math.toRadians(90)))
-                .lineToX(60)
+                .lineToY(60)
                 .build();
 
         Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-12,60,Math.toRadians(90)))

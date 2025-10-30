@@ -21,7 +21,7 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
 //@Disabled
-@Autonomous(name = "Blue_Side_No_Spike_Marks", group = "Autonomous")
+@Autonomous(name = "Blue_Side_Close", group = "Autonomous")
 public class Blue_Side_Close extends LinearOpMode {
 
     @Override
