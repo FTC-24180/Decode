@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -19,7 +20,7 @@ import org.firstinspires.ftc.teamcode.BBcode.PoseStorage;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @Config
-@Disabled
+//@Disabled
 @Autonomous(name = "Red_Side_Spike_Marks", group = "Autonomous")
 public class Red_Side_Far extends LinearOpMode {
 
@@ -46,31 +47,31 @@ public class Red_Side_Far extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(0,0), Math.toRadians(0))
+                .strafeToLinearHeading(new Vector2d(59,15), Math.toRadians(160))
                 .build();
 
         Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(5)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(0,0),Math.toRadians(0))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(59,15,Math.toRadians(160)))
+                .strafeToLinearHeading(new Vector2d(36,30),Math.toRadians(90))
                 .build();
 
-        Action driveToIntake = drive.actionBuilder(drive.localizer.getPose())
-                .lineToX(0)
+        Action driveToIntake = drive.actionBuilder(new Pose2d(36,30,Math.toRadians(90)))
+                .lineToX(60)
                 .build();
 
-        Action driveToSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(0,0), Math.toRadians(0))
+        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,60,Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-12,12), Math.toRadians(135))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(5)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(0,0), Math.toRadians(0))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-12,12, Math.toRadians(135)))
+                .strafeToLinearHeading(new Vector2d(12,30), Math.toRadians(90))
                 .build();
 
         //----------------------------------------------------------------------------------------------

@@ -4,6 +4,6 @@ import com.acmerobotics.roadrunner.Pose2d;
 
 public class RedSidePose {
     //TODO NEEDS tuning
-    public final static Pose2d init_close = new Pose2d(0, 0, Math.toRadians(0));
-    public final static Pose2d init_far = new Pose2d(0, 0, Math.toRadians(0));
+    public final static Pose2d init_close = new Pose2d(-64, 40, Math.toRadians(90));
+    public final static Pose2d init_far = new Pose2d(64, 16, Math.toRadians(180));
 }
