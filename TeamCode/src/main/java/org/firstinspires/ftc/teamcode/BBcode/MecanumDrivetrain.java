@@ -94,7 +94,7 @@ public class MecanumDrivetrain {
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        if (false/*PoseStorage.hasFieldCentricDrive*/) {
+        if (PoseStorage.hasFieldCentricDrive) {
             if (gamepad1.left_trigger > 0) {
                 Vector2d goalPosition = new Vector2d(0,0);
                 switch (PoseStorage.alliance) {
@@ -102,7 +102,7 @@ public class MecanumDrivetrain {
                         goalPosition = new Vector2d(-72,-72);
                         break;
                     case BLUE:
-                        goalPosition = new Vector2d(72,-72);
+                        goalPosition = new Vector2d(-72,72);
                         break;
                 }
                 double offestX = localizer.getPose().position.x + goalPosition.x;
