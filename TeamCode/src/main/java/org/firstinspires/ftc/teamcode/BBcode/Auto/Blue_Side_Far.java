@@ -47,23 +47,27 @@ public class Blue_Side_Far extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFarLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(59,-15), Math.toRadians(-160))
+                .strafeToLinearHeading(new Vector2d(59,-15), Math.toRadians(-155))
+                .build();
+
+        Action waitForFlyWheelSpinUp = drive.actionBuilder(drive.localizer.getPose())
+                .waitSeconds(3.5)
                 .build();
 
         Action waitForFarLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(5)
+                .waitSeconds(3.5)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(59,-15,Math.toRadians(-160)))
-                .strafeToLinearHeading(new Vector2d(36,-30),Math.toRadians(-90))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(59,-15,Math.toRadians(-155)))
+                .strafeToLinearHeading(new Vector2d(36,-32),Math.toRadians(-90))
                 .build();
 
-        Action driveToIntake = drive.actionBuilder(new Pose2d(36,-30,Math.toRadians(-90)))
-                .lineToY(-60)
+        Action driveToIntake = drive.actionBuilder(new Pose2d(36,-32,Math.toRadians(-90)))
+                .lineToY(-75)
                 .build();
 
-        Action driveToMiddleLaunch = drive.actionBuilder(new Pose2d(36,-60,Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(-12,-12), Math.toRadians(-135))
+        Action driveToMiddleLaunch = drive.actionBuilder(new Pose2d(36,-75,Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-14,-16), Math.toRadians(-135))
                 .build();
 
         Action waitForMiddleLaunch = drive.actionBuilder(drive.localizer.getPose())
@@ -81,14 +85,15 @@ public class Blue_Side_Far extends LinearOpMode {
                         _LauncherActions.longLaunch(),
                         _IntakeAction.intake(),
                         driveToFarLaunch,
+                        waitForFlyWheelSpinUp,
                         _StoppersActions.transfer(),
                         _TransferActions.Transfering(),
                         waitForFarLaunch,
                         _StoppersActions.stop(),
                         _TransferActions.NotTransfering(),
+                        _LauncherActions.mediumLaunch(),
                         driveToSpikeMark,
                         driveToIntake,
-                        _LauncherActions.mediumLaunch(),
                         driveToMiddleLaunch,
                         _StoppersActions.transfer(),
                         _TransferActions.Transfering(),

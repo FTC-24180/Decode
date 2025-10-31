@@ -47,7 +47,11 @@ public class Red_Side_Far extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(50,16), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(59,15), Math.toRadians(160))
+                .build();
+
+        Action waitForFlyWheelSpinUp = drive.actionBuilder(drive.localizer.getPose())
+                .waitSeconds(1.5)
                 .build();
 
         Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
@@ -78,22 +82,23 @@ public class Red_Side_Far extends LinearOpMode {
 
         Actions.runBlocking(
                 new SequentialAction(
-//                        _LauncherActions.longLaunch(),
-//                        _IntakeAction.intake(),
-                        driveToFirstLaunch//,
-//                        _StoppersActions.transfer(),
-//                        _TransferActions.Transfering(),
-//                        waitForFirstLaunch,
-//                        _StoppersActions.stop(),
-//                        _TransferActions.NotTransfering(),
-//                        driveToSpikeMark//,
-//                        driveToIntake,
-//                        _LauncherActions.mediumLaunch(),
-//                        driveToSecondLaunch,
-//                        _StoppersActions.transfer(),
-//                        _TransferActions.Transfering(),
-//                        waitForSecondLaunch,
-//                        driveToSpikeMarkPark
+                        _LauncherActions.longLaunch(),
+                        _IntakeAction.intake(),
+                        driveToFirstLaunch,
+                        waitForFlyWheelSpinUp,
+                        _StoppersActions.transfer(),
+                        _TransferActions.Transfering(),
+                        waitForFirstLaunch,
+                        _StoppersActions.stop(),
+                        _TransferActions.NotTransfering(),
+                        driveToSpikeMark,
+                        driveToIntake,
+                        _LauncherActions.mediumLaunch(),
+                        driveToSecondLaunch,
+                        _StoppersActions.transfer(),
+                        _TransferActions.Transfering(),
+                        waitForSecondLaunch,
+                        driveToSpikeMarkPark
                 )
         );
     }

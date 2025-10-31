@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.BBcode.MechanismControllers;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 public class Transfer {
     OpMode opMode;
@@ -13,7 +14,7 @@ public class Transfer {
     }
     //-----------------------------------------
     // Constants
-    final double TRANSFER_VELOCITY = 4;
+    final double TRANSFER_VELOCITY = 9;
     final double STOPPED_VELOCITY = 0;
     final double RPS_TO_TPS = 103.8;
 
@@ -32,6 +33,7 @@ public class Transfer {
             opMode.telemetry.addLine("Transfer Motor not found!");
         } else {
             double tps = rps * RPS_TO_TPS;
+            transfer.setDirection(DcMotorSimple.Direction.REVERSE);
             transfer.setVelocity(tps);
         }
     }
