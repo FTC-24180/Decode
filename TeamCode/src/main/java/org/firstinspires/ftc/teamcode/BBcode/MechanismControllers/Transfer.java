@@ -14,9 +14,9 @@ public class Transfer {
     }
     //-----------------------------------------
     // Constants
-    final double TRANSFER_VELOCITY = 9;
+    final double TRANSFER_VELOCITY = 85;
     final double STOPPED_VELOCITY = 0;
-    final double RPS_TO_TPS = 103.8;
+    final double RPS_TO_TPS = 28;
 
     //-----------------------------------------
 

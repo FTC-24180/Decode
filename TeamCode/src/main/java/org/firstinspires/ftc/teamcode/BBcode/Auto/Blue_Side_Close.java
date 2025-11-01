@@ -47,7 +47,7 @@ public class Blue_Side_Close extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(-24,-24), Math.toRadians(-135))
+                .strafeToLinearHeading(new Vector2d(-26,-20), Math.toRadians(-135))
                 .build();
 
         Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
@@ -63,14 +63,14 @@ public class Blue_Side_Close extends LinearOpMode {
                 .build();
 
         Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-12,-60,Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(-12,-12), Math.toRadians(-135))
+                .strafeToLinearHeading(new Vector2d(-26,-20), Math.toRadians(-135))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(5)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-12,-12,Math.toRadians(-135)))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-26,-20,Math.toRadians(-135)))
                 .strafeToLinearHeading(new Vector2d(12,-30), Math.toRadians(-90))
                 .build();
 
