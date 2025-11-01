@@ -21,8 +21,8 @@ public class Launcher {
     // Constants
     final double IDLE_VELOCITY = 30;
     final double STOPPED_VELOCITY = 0;
-    final double Short_Launch_Velocity = 45;
-    final double Medium_Launch_Velocity = 50;
+    final double Short_Launch_Velocity = 60;
+    final double Medium_Launch_Velocity = 60;
     final double Long_Launch_Velocity = 67.5;
     final double RPS_TO_TPS = 28;
 

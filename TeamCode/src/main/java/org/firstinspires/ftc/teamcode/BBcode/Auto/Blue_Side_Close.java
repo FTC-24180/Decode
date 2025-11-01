@@ -47,31 +47,31 @@ public class Blue_Side_Close extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(-26,-20), Math.toRadians(-135))
+                .strafeToLinearHeading(new Vector2d(-20,-9), Math.toRadians(-135))
                 .build();
 
         Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(5)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-24,-24,Math.toRadians(-135)))
-                .strafeToLinearHeading(new Vector2d(-12,-30),Math.toRadians(-90))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-20,-9,Math.toRadians(-135)))
+                .strafeToLinearHeading(new Vector2d(-14,-25),Math.toRadians(-90))
                 .build();
 
-        Action driveToIntake = drive.actionBuilder(new Pose2d(-12,-30,Math.toRadians(-90)))
-                .lineToY(-60)
+        Action driveToIntake = drive.actionBuilder(new Pose2d(-14,-25,Math.toRadians(-90)))
+                .lineToY(-57)
                 .build();
 
-        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-12,-60,Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(-26,-20), Math.toRadians(-135))
+        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-12,-57,Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-20,-9), Math.toRadians(-135))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(5)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-26,-20,Math.toRadians(-135)))
-                .strafeToLinearHeading(new Vector2d(12,-30), Math.toRadians(-90))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-20,-9,Math.toRadians(-135)))
+                .strafeToLinearHeading(new Vector2d(12,-25), Math.toRadians(-90))
                 .build();
 
         //----------------------------------------------------------------------------------------------

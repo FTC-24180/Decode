@@ -63,10 +63,10 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action driveToIntake = drive.actionBuilder(new Pose2d(36,-32,Math.toRadians(-90)))
-                .lineToY(-75)
+                .lineToY(-74)
                 .build();
 
-        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,-75,Math.toRadians(-90)))
+        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,-74,Math.toRadians(-90)))
                 .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-157.5))
                 .build();
 
@@ -79,10 +79,10 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(14,-30, Math.toRadians(-90)))
-                .lineToY(-75)
+                .lineToY(-74)
                 .build();
 
-        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,-75, Math.toRadians(-90)))
+        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,-74, Math.toRadians(-90)))
                 .strafeToLinearHeading(new Vector2d(10,-25), Math.toRadians(-90))
                 .build();
 
