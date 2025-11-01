@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -9,6 +10,11 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.BlueSidePose;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismActionBuilders.IntakeActions;
@@ -39,6 +45,9 @@ public class Blue_Side_Far extends LinearOpMode {
         MecanumDrive drive = new MecanumDrive(hardwareMap, BlueSidePose.init_far);
 
         telemetry.update();
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        DcMotorEx launcherMotor = hardwareMap.get(DcMotorEx.class, "launcher");
+        PIDFCoefficients pidCoeffs = launcherMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
         waitForStart();
         //----------------------------------------------------------------------------------------------
 
@@ -97,28 +106,30 @@ public class Blue_Side_Far extends LinearOpMode {
         //----------------------------------------------------------------------------------------------
 
         Actions.runBlocking(
-                new SequentialAction(
-                        _LauncherActions.longLaunch(),
-                        driveToFarLaunch,
-                        waitForFlyWheelSpinUp,
-                        _IntakeAction.intake(),
-                        _StoppersActions.transfer(),
-                        _TransferActions.Transfering(),
-                        waitForFarLaunch,
-                        _StoppersActions.stop(),
-                        _TransferActions.NotTransfering(),
-                        driveToSpikeMark,
-                        driveToIntake,
-                        driveToSecondLaunch,
-                        _StoppersActions.transfer(),
-                        _TransferActions.Transfering(),
-                        waitForSecondLaunch,
-                        _StoppersActions.stop(),
-                        _TransferActions.NotTransfering(),
-                        _LauncherActions.mediumLaunch(),
-                        driveToSpikeMarkPark,
-                        driveToIntakeSecond,
-                        driveToThirdLaunch
+                new ParallelAction(
+                        _LauncherActions.telemetryAction,
+                        new SequentialAction(
+                                _LauncherActions.longLaunch(),
+                                driveToFarLaunch,
+                                waitForFlyWheelSpinUp,
+                                _IntakeAction.intake(),
+                                _StoppersActions.transfer(),
+                                _TransferActions.Transfering(),
+                                waitForFarLaunch,
+                                _StoppersActions.stop(),
+                                _TransferActions.NotTransfering(),
+                                driveToSpikeMark,
+                                driveToIntake,
+                                driveToSecondLaunch,
+                                _StoppersActions.transfer(),
+                                _TransferActions.Transfering(),
+                                waitForSecondLaunch,
+                                _StoppersActions.stop(),
+                                _TransferActions.NotTransfering(),
+                                _LauncherActions.mediumLaunch(),
+                                driveToSpikeMarkPark,
+                                driveToIntakeSecond,
+                                driveToThirdLaunch
 //                        _StoppersActions.transfer(),
 //                        _TransferActions.Transfering(),
 //                        waitForThirdLaunch,
@@ -127,7 +138,9 @@ public class Blue_Side_Far extends LinearOpMode {
 //                        _LauncherActions.stop(),
 //                        driveToPark
 
+                        )
                 )
+
         );
     }
 }
