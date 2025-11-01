@@ -1,20 +1,37 @@
 package org.firstinspires.ftc.teamcode.BBcode.Tuning;
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.CRServo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 @TeleOp(name = " Robot Tuner" )
 public class RobotTuner extends OpMode {
+    private FtcDashboard dashboard = FtcDashboard.getInstance();
+    DcMotorEx launcher;
     CRServo leftInserter;
     CRServo rightInserter;
     DcMotorEx[] motors = new DcMotorEx[3];
     int selectedMotor = 0;
     double requestedVelocity = 0;
     boolean isActive = false;
+    final double TPR_435 = 383.6;
+    final double TPR_1620 = 103.8;
+    final double TPR_6000 = 28;
+    PIDFCoefficients origCoeffs;
+    // Create new coefficients
+    double P = 50.0;   // increase for faster recovery
+    double I = 0.05;   // low; avoids long-term drift
+    double D = 2.5;    // helps suppress overshoot
+    double F = 13.5;   // depends on motor max velocity and voltage
 
     @Override
     public void init() {
@@ -25,9 +42,27 @@ public class RobotTuner extends OpMode {
             motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
             motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         }
+        // Set ticks per revolution directly on MotorType
+        motors[0].getMotorType().setTicksPerRev(TPR_6000); // launcher
+        motors[1].getMotorType().setTicksPerRev(TPR_435); // transfer
+        motors[2].getMotorType().setTicksPerRev(TPR_6000); // intake
+
         motors[1].setDirection(DcMotorSimple.Direction.REVERSE);
+
         leftInserter = hardwareMap.tryGet(CRServo.class, "leftInserter");
         rightInserter = hardwareMap.tryGet(CRServo.class, "rightInserter");
+
+        DcMotorEx launcher = motors[0];
+        // Get the current coefficients (optional)
+        origCoeffs = launcher.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
+
+
+        PIDFCoefficients customCoeffs = new PIDFCoefficients(P, I, D, F);
+
+ //Apply them
+        launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, customCoeffs);
+
     }
 
     @Override
@@ -79,11 +114,28 @@ public class RobotTuner extends OpMode {
         } else {
             telemetry.addLine("Selected motor can not be found");
         }
+        double ticksPerSecond = motors[selectedMotor].getVelocity();
+        double ticksPerRev = motors[selectedMotor].getMotorType().getTicksPerRev();
+        double rotationsPerSecond = ticksPerSecond / ticksPerRev;
+
+
+        telemetry.addData("Original Coefficients", "P: %.2f I: %.2f D: %.2f F: %.2f",
+                origCoeffs.p, origCoeffs.i, origCoeffs.d, origCoeffs.f);
+
+        telemetry.addData("Current Coefficients", "P: %.2f I: %.2f D: %.2f F: %.2f",
+                P, I, D, F);
         telemetry.addData("Current Motor", selectedMotor);
         telemetry.addData("Requested velocity", requestedVelocity);
         telemetry.addData("Selected motor velocity", motors[selectedMotor].getVelocity());
         telemetry.addData("Selected motor is active", isActive);
         telemetry.addData("Encoder is active", motors[selectedMotor].getCurrentPosition() != 0);
+
+        TelemetryPacket packet = new TelemetryPacket();
+        packet.put("Launcher RPS", rotationsPerSecond);
+        packet.put("Launcher ticksPerRev", ticksPerRev);
+        packet.put("Launcher ticksPerSecond", ticksPerSecond);
+        dashboard.sendTelemetryPacket(packet);
+
         telemetry.update();
     }
 }

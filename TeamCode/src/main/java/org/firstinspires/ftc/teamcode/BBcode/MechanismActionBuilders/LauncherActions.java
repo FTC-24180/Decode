@@ -53,6 +53,22 @@ public class LauncherActions {
         }
     }
     public Action longLaunch() {return new longLaunchAction();}
+
+    // Telemetry action: runs while autonomous sequence is active
+    public Action telemetryAction = new Action() {
+        @Override
+        public boolean run(@NonNull TelemetryPacket packet) {
+            double velocity = launcher.launcher.getVelocity();
+            double ticksPerRev = launcher.launcher.getMotorType().getTicksPerRev();
+            double rps = velocity / ticksPerRev;
+
+            packet.put("Launcher Velocity", velocity);
+            packet.put("Launcher RPS", rps);
+            //packet.put("PID Coefficients", String.format("P: %.2f I: %.2f D: %.2f F: %.2f", pidCoeffs.p, pidCoeffs.i, pidCoeffs.d, pidCoeffs.f));
+
+            return true;
+        }
+    };
 //
 //    public class launchAction implements Action {
 //        @Override

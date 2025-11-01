@@ -1,15 +1,21 @@
 package org.firstinspires.ftc.teamcode.BBcode.MechanismControllers;
 
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 public class Launcher {
     OpMode opMode;
-    DcMotorEx launcher;
+    final double TPR_6000 = 28;
+    final public DcMotorEx launcher;
+    public final PIDFCoefficients customCoeffs = new PIDFCoefficients(50.0, 0.05, 2.5, 13.5);
     public Launcher(OpMode opMode)
     {
         this.opMode = opMode;
         launcher = this.opMode.hardwareMap.tryGet(DcMotorEx.class, "launcher");
+        launcher.getMotorType().setTicksPerRev(TPR_6000);
+        launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, customCoeffs);
     }
     //-----------------------------------------
     // Constants
@@ -19,6 +25,9 @@ public class Launcher {
     final double Medium_Launch_Velocity = 50;
     final double Long_Launch_Velocity = 100;
     final double RPS_TO_TPS = 28;
+
+
+
 
     //-----------------------------------------
 
