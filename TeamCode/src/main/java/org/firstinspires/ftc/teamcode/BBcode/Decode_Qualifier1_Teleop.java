@@ -37,7 +37,7 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         switch (state) {
             case LAUNCHING:
                 intake.intakeArtifacts();
-                launcher.launch();
+                launcher.launch(drivetrain.getDistanceFromGoal());
                 stoppers.transfer();
                 transfer.transfer();
 
@@ -50,7 +50,7 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                 break;
             case AIMING:
                 intake.intakeArtifacts();
-                launcher.launch();
+                launcher.launch(drivetrain.getDistanceFromGoal());
                 stoppers.stop();
                 transfer.stop();
                 drivetrain.Drive();

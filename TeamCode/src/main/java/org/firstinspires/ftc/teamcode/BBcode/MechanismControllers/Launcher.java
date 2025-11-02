@@ -31,8 +31,8 @@ public class Launcher {
 
     //-----------------------------------------
 
-    public void launch() {
-        double rps = 58; // TODO: This value should be calculated based on the range to the goal.
+    public void launch(double distanceFromGoal) {
+        double rps = (0.000027 * Math.pow(distanceFromGoal, 3)) + (-0.00827 * Math.pow(distanceFromGoal, 2)) + (0.9043 * distanceFromGoal) + 23.35;
         setVelocity(rps);
     }
     public void shortLaunch() {setVelocity(Short_Launch_Velocity);}

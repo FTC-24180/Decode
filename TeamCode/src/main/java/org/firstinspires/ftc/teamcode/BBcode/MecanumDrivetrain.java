@@ -47,6 +47,7 @@ public class MecanumDrivetrain {
     double lastHeadingError;
     double lastRobotRelativeX;
     double lastRobotRelativeY;
+    Vector2d goalPosition;
 
     // Constructor
     public MecanumDrivetrain(OpMode opMode) {
@@ -96,7 +97,6 @@ public class MecanumDrivetrain {
         Pose2d targetPose = null;
         if (PoseStorage.hasFieldCentricDrive) {
             if (gamepad1.left_trigger > 0) {
-                Vector2d goalPosition = new Vector2d(0,0);
                 switch (PoseStorage.alliance) {
                     case RED:
                         goalPosition = new Vector2d(-72,-72);
@@ -229,6 +229,24 @@ public class MecanumDrivetrain {
 
             // Return the motor powers.
             return new double[]{leftFrontPower, rightFrontPower, leftBackPower, rightBackPower};
+        }
+    }
+
+    public double getDistanceFromGoal() {
+        if (PoseStorage.hasFieldCentricDrive) {
+            switch (PoseStorage.alliance) {
+                case RED:
+                    goalPosition = new Vector2d(-72,72);
+                    break;
+                case BLUE:
+                    goalPosition = new Vector2d(-72,-72);
+                    break;
+            }
+            double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+            double yDistance = Math.abs(goalPosition.y - localizer.getPose().position.y);
+            return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+        } else {
+            return 102;
         }
     }
 }
