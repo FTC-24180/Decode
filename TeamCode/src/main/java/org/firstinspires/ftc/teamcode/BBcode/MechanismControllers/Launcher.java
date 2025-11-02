@@ -32,7 +32,7 @@ public class Launcher {
     //-----------------------------------------
 
     public void launch() {
-        double rps = 45; // TODO: This value should be calculated based on the range to the goal.
+        double rps = 58; // TODO: This value should be calculated based on the range to the goal.
         setVelocity(rps);
     }
     public void shortLaunch() {setVelocity(Short_Launch_Velocity);}
