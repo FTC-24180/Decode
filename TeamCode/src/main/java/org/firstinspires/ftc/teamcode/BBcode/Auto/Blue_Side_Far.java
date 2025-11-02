@@ -60,11 +60,11 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action waitForFlyWheelSpinUp = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(2.25)
+                .waitSeconds(2.75)
                 .build();
 
         Action waitForFarLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(3)
+                .waitSeconds(3.5)
                 .build();
 
         Action driveToSpikeMark = drive.actionBuilder(new Pose2d(50,-15,Math.toRadians(-158)))
@@ -80,7 +80,7 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(3)
+                .waitSeconds(3.75)
                 .build();
 
         Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(50,-15, Math.toRadians(-158)))
@@ -92,15 +92,14 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(13.5,-74, Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(10,-25), Math.toRadians(-90))
-                .strafeToLinearHeading(new Vector2d(-20,-9), Math.toRadians(-135))
+                .splineToLinearHeading(new Pose2d(-27,-22, Math.toRadians(-123)), Math.toRadians(0))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(3)
+                .waitSeconds(3.75)
                 .build();
 
-        Action driveToPark = drive.actionBuilder(new Pose2d(-20,-9, Math.toRadians(-135)))
+        Action driveToPark = drive.actionBuilder(new Pose2d(-40,-7, Math.toRadians(-120)))
                 .strafeToLinearHeading(new Vector2d(0,-25), Math.toRadians(-90))
                 .build();
 
@@ -133,8 +132,8 @@ public class Blue_Side_Far extends LinearOpMode {
                                 driveToThirdLaunch,
                                 _StoppersActions.transfer(),
                                 _TransferActions.Transfering(),
-                                waitForThirdLaunch,
-                                driveToPark
+                                waitForThirdLaunch
+//                                driveToPark
 
                         )
                 )
