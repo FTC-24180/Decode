@@ -56,7 +56,7 @@ public class Blue_Side_Far extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFarLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-157.5))
+                .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-158))
                 .build();
 
         Action waitForFlyWheelSpinUp = drive.actionBuilder(drive.localizer.getPose())
@@ -64,10 +64,10 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action waitForFarLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(10) //3
+                .waitSeconds(3)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(50,-15,Math.toRadians(-157.5)))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(50,-15,Math.toRadians(-158)))
                 .strafeToLinearHeading(new Vector2d(36,-32),Math.toRadians(-90))
                 .build();
 
@@ -76,30 +76,31 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,-74,Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-157.5))
+                .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-158))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(50,-15, Math.toRadians(-157.5)))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(50,-15, Math.toRadians(-158)))
                 .strafeToLinearHeading(new Vector2d(13.5,-30), Math.toRadians(-90))
                 .build();
 
-        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(14,-30, Math.toRadians(-90)))
+        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(13.5,-30, Math.toRadians(-90)))
                 .lineToY(-74)
                 .build();
 
-        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,-74, Math.toRadians(-90)))
+        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(13.5,-74, Math.toRadians(-90)))
                 .strafeToLinearHeading(new Vector2d(10,-25), Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-20,-9), Math.toRadians(-135))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
 
-        Action driveToPark = drive.actionBuilder(new Pose2d(10,0, Math.toRadians(-90)))
+        Action driveToPark = drive.actionBuilder(new Pose2d(-20,-9, Math.toRadians(-135)))
                 .strafeToLinearHeading(new Vector2d(0,-25), Math.toRadians(-90))
                 .build();
 
@@ -129,14 +130,11 @@ public class Blue_Side_Far extends LinearOpMode {
                                 _LauncherActions.mediumLaunch(),
                                 driveToSpikeMarkPark,
                                 driveToIntakeSecond,
-                                driveToThirdLaunch
-//                        _StoppersActions.transfer(),
-//                        _TransferActions.Transfering(),
-//                        waitForThirdLaunch,
-//                        _StoppersActions.transfer(),
-//                        _TransferActions.Transfering(),
-//                        _LauncherActions.stop(),
-//                        driveToPark
+                                driveToThirdLaunch,
+                                _StoppersActions.transfer(),
+                                _TransferActions.Transfering(),
+                                waitForThirdLaunch,
+                                driveToPark
 
                         )
                 )

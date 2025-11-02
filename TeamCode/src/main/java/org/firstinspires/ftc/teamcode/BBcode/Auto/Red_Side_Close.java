@@ -47,31 +47,49 @@ public class Red_Side_Close extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(-24,24), Math.toRadians(135))
+                .strafeToLinearHeading(new Vector2d(-20,9), Math.toRadians(135))
                 .build();
 
         Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(5)
+                .waitSeconds(4)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-24,24,Math.toRadians(135)))
-                .strafeToLinearHeading(new Vector2d(-12,30),Math.toRadians(90))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-20,9,Math.toRadians(135)))
+                .strafeToLinearHeading(new Vector2d(-14,25),Math.toRadians(90))
                 .build();
 
-        Action driveToIntake = drive.actionBuilder(new Pose2d(-12,30,Math.toRadians(90)))
-                .lineToY(60)
+        Action driveToIntake = drive.actionBuilder(new Pose2d(-14,25,Math.toRadians(90)))
+                .lineToY(57)
                 .build();
 
-        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-12,60,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(-12,12), Math.toRadians(135))
+        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-14,57,Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(-20,9), Math.toRadians(135))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(5)
+                .waitSeconds(3)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-12,12,Math.toRadians(135)))
-                .strafeToLinearHeading(new Vector2d(12,30), Math.toRadians(90))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-20,9,Math.toRadians(135)))
+                .strafeToLinearHeading(new Vector2d(13.5,30), Math.toRadians(90))
+                .build();
+
+
+        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(13.5,30, Math.toRadians(90)))
+                .lineToY(74)
+                .build();
+
+        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,74, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(10,-25), Math.toRadians(90))
+                .strafeToLinearHeading(new Vector2d(-20,9), Math.toRadians(135))
+                .build();
+
+        Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
+                .waitSeconds(3)
+                .build();
+
+        Action driveToPark = drive.actionBuilder(new Pose2d(-20,9, Math.toRadians(135)))
+                .strafeToLinearHeading(new Vector2d(0,-25), Math.toRadians(-90))
                 .build();
 
         //----------------------------------------------------------------------------------------------
