@@ -16,7 +16,6 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 @TeleOp(name = " Robot Tuner" )
 public class RobotTuner extends OpMode {
     private FtcDashboard dashboard = FtcDashboard.getInstance();
-    DcMotorEx launcher;
     CRServo leftInserter;
     CRServo rightInserter;
     DcMotorEx[] motors = new DcMotorEx[3];
@@ -76,15 +75,15 @@ public class RobotTuner extends OpMode {
             isActive = false;
         }
         if (gamepad1.dpadUpWasPressed()) {
-            requestedVelocity = Math.min(requestedVelocity + 10, 3000);
+            requestedVelocity = Math.min(requestedVelocity + 1, 100);
             if (gamepad1.right_trigger > 0) {
-                requestedVelocity = Math.min(requestedVelocity + 100, 3000);
+                requestedVelocity = Math.min(requestedVelocity + 10, 100);
             }
         }
         if (gamepad1.dpadDownWasPressed()) {
-            requestedVelocity = Math.max(requestedVelocity - 10, 0);
+            requestedVelocity = Math.max(requestedVelocity - 1, 0);
             if (gamepad1.right_trigger > 0) {
-                requestedVelocity = Math.max(requestedVelocity - 100, 0);
+                requestedVelocity = Math.max(requestedVelocity - 10, 0);
             }
         }
         if (gamepad1.aWasPressed()) {
@@ -107,7 +106,7 @@ public class RobotTuner extends OpMode {
 
         if (motors[selectedMotor] != null) {
             if (isActive) {
-                motors[selectedMotor].setVelocity(requestedVelocity);
+                motors[selectedMotor].setVelocity(requestedVelocity * motors[selectedMotor].getMotorType().getTicksPerRev());
             } else {
                 motors[selectedMotor].setVelocity(0);
             }
@@ -125,8 +124,8 @@ public class RobotTuner extends OpMode {
         telemetry.addData("Current Coefficients", "P: %.2f I: %.2f D: %.2f F: %.2f",
                 P, I, D, F);
         telemetry.addData("Current Motor", selectedMotor);
-        telemetry.addData("Requested velocity", requestedVelocity);
-        telemetry.addData("Selected motor velocity", motors[selectedMotor].getVelocity());
+        telemetry.addData("Requested velocity (RPS)", requestedVelocity);
+        telemetry.addData("Selected motor velocity (RPS)", rotationsPerSecond);
         telemetry.addData("Selected motor is active", isActive);
         telemetry.addData("Encoder is active", motors[selectedMotor].getCurrentPosition() != 0);
 

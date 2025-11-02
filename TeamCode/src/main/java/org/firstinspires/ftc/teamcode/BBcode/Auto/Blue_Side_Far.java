@@ -64,7 +64,7 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action waitForFarLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(3)
+                .waitSeconds(10) //3
                 .build();
 
         Action driveToSpikeMark = drive.actionBuilder(new Pose2d(50,-15,Math.toRadians(-157.5)))
