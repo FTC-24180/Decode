@@ -21,7 +21,6 @@ public class RobotTuner extends OpMode {
     DcMotorEx[] motors = new DcMotorEx[3];
     int selectedMotor = 0;
     double requestedVelocity = 0;
-    double requestedPower = 0;
     boolean isActive = false;
     final double TPR_435 = 383.6;
     final double TPR_1620 = 103.8;
@@ -38,18 +37,16 @@ public class RobotTuner extends OpMode {
         motors[0] = hardwareMap.tryGet(DcMotorEx.class, "launcher");
         motors[1] = hardwareMap.tryGet(DcMotorEx.class, "transfer");
         motors[2] = hardwareMap.tryGet(DcMotorEx.class, "intake");
-        motors[0].setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        motors[0].setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        for (DcMotorEx motor: motors) {
-//            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-//            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-//        }
+        for (DcMotorEx motor: motors) {
+            motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+            motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        }
         // Set ticks per revolution directly on MotorType
         motors[0].getMotorType().setTicksPerRev(TPR_6000); // launcher
-        //motors[1].getMotorType().setTicksPerRev(TPR_435); // transfer
-        //motors[2].getMotorType().setTicksPerRev(TPR_6000); // intake
+        motors[1].getMotorType().setTicksPerRev(TPR_435); // transfer
+        motors[2].getMotorType().setTicksPerRev(TPR_6000); // intake
 
-        //motors[1].setDirection(DcMotorSimple.Direction.REVERSE);
+        motors[1].setDirection(DcMotorSimple.Direction.REVERSE);
 
         leftInserter = hardwareMap.tryGet(CRServo.class, "leftInserter");
         rightInserter = hardwareMap.tryGet(CRServo.class, "rightInserter");
@@ -63,7 +60,7 @@ public class RobotTuner extends OpMode {
         PIDFCoefficients customCoeffs = new PIDFCoefficients(P, I, D, F);
 
  //Apply them
-        //launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, customCoeffs);
+        launcher.setPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER, customCoeffs);
 
     }
 
@@ -89,18 +86,6 @@ public class RobotTuner extends OpMode {
                 requestedVelocity = Math.max(requestedVelocity - 10, 0);
             }
         }
-        if (gamepad1.dpadRightWasPressed()) {
-            requestedPower = Math.min(requestedPower + 0.01, 1);
-            if (gamepad1.right_trigger > 0) {
-                requestedPower = Math.min(requestedPower + 0.1, 1);
-            }
-        }
-        if (gamepad1.dpadLeftWasPressed()) {
-            requestedPower = Math.max(requestedPower - 0.01, 0);
-            if (gamepad1.right_trigger > 0) {
-                requestedPower = Math.max(requestedPower - 0.1, 0);
-            }
-        }
         if (gamepad1.aWasPressed()) {
             isActive = false;
         }
@@ -119,17 +104,11 @@ public class RobotTuner extends OpMode {
         }
 
 
-        if (motors[selectedMotor] != null && !(gamepad1.left_trigger > 1)) {
+        if (motors[selectedMotor] != null) {
             if (isActive) {
                 motors[selectedMotor].setVelocity(requestedVelocity * motors[selectedMotor].getMotorType().getTicksPerRev());
             } else {
                 motors[selectedMotor].setVelocity(0);
-            }
-        } else if (motors[selectedMotor] != null){
-            if (isActive) {
-                motors[selectedMotor].setPower(requestedPower);
-            } else {
-                motors[selectedMotor].setPower(0);
             }
         } else {
             telemetry.addLine("Selected motor can not be found");
