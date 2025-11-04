@@ -6,7 +6,6 @@ import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Intake;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Launcher;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Stoppers;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Transfer;
-import org.firstinspires.ftc.teamcode.MecanumDrive;
 
 @TeleOp (name = "*Main TeleOp")
 public class Decode_Qualifier1_Teleop extends OpMode {
@@ -20,7 +19,7 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         LAUNCHING,
         AIMING,
         INTAKING,
-        IDLE
+        SAFE
     }
     State state = State.INTAKING;
     @Override
@@ -42,10 +41,10 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                 transfer.transfer();
 
                 if (gamepad1.right_trigger == 0) {
-                    state = State.AIMING;
+                    state = State.INTAKING;
                 }
                 if (gamepad1.backWasPressed()) {
-                    state = State.IDLE;
+                    state = State.SAFE;
                 }
                 break;
             case AIMING:
@@ -58,11 +57,11 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                 if (gamepad1.right_trigger > 0) {
                     state = State.LAUNCHING;
                 }
-                if (gamepad1.left_trigger == 0) {
+                if (!gamepad1.left_bumper) {
                     state = State.INTAKING;
                 }
                 if (gamepad1.backWasPressed()) {
-                    state = State.IDLE;
+                    state = State.SAFE;
                 }
                 break;
             case INTAKING:
@@ -72,14 +71,18 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                 transfer.stop();
                 drivetrain.Drive();
 
-                if (gamepad1.left_trigger > 0) {
+                if (gamepad1.right_trigger > 0) {
+                    state = State.LAUNCHING;
+                }
+
+                if (gamepad1.left_bumper) {
                     state = State.AIMING;
                 }
                 if (gamepad1.backWasPressed()) {
-                    state = State.IDLE;
+                    state = State.SAFE;
                 }
                 break;
-            case IDLE:
+            case SAFE:
                 intake.stop();
                 launcher.stop();
                 stoppers.stop();
