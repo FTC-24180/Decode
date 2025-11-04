@@ -46,15 +46,15 @@ public class Blue_Side_Close extends LinearOpMode {
 
         //TODO ALL Action builders need position data/tuning
 
-        Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(new Vector2d(-20,-9), Math.toRadians(-135))
+        Action driveToFirstLaunch = drive.actionBuilder(new Pose2d(-61.75, -39, Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-32,-20), Math.toRadians(-127))
                 .build();
 
         Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(4)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-20,-9,Math.toRadians(-135)))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-32,-20,Math.toRadians(-127)))
                 .strafeToLinearHeading(new Vector2d(-14,-25),Math.toRadians(-90))
                 .build();
 
@@ -63,32 +63,29 @@ public class Blue_Side_Close extends LinearOpMode {
                 .build();
 
         Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-14,-57,Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(-20,-9), Math.toRadians(-135))
+                .strafeToLinearHeading(new Vector2d(-32,-20), Math.toRadians(-127))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-20,-9,Math.toRadians(-135)))
-                .strafeToLinearHeading(new Vector2d(13.5,-30), Math.toRadians(-90))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-32,-20,Math.toRadians(-127)))
+                .strafeToLinearHeading(new Vector2d(13.5,-22), Math.toRadians(-90))
                 .build();
 
 
-        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(14,-30, Math.toRadians(-90)))
+        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(13.5,-22, Math.toRadians(-90)))
                 .lineToY(-74)
                 .build();
 
         Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,-74, Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(10,-25), Math.toRadians(-90))
+                .strafeTo(new Vector2d(10, -35))
+                .strafeToLinearHeading(new Vector2d(-32,-20), Math.toRadians(-127))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
-                .build();
-
-        Action driveToPark = drive.actionBuilder(new Pose2d(10,0, Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(0,-25), Math.toRadians(-90))
                 .build();
 
         //----------------------------------------------------------------------------------------------
@@ -110,7 +107,12 @@ public class Blue_Side_Close extends LinearOpMode {
                         _StoppersActions.transfer(),
                         _TransferActions.Transfering(),
                         waitForSecondLaunch,
-                        driveToSpikeMarkPark
+                        driveToSpikeMarkPark,
+                        driveToIntakeSecond,
+                        driveToThirdLaunch,
+                        _StoppersActions.transfer(),
+                        _TransferActions.Transfering(),
+                        waitForThirdLaunch
                 )
         );
     }

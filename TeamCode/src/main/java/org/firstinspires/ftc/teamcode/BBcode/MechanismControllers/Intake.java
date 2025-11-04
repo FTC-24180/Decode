@@ -13,7 +13,7 @@ public class Intake {
     }
     //-----------------------------------------
     // Constants
-    final double INTAKE_VELOCITY = 30; // Motor speed while intaking. Unit RPS
+    final double INTAKE_VELOCITY = 37.5; // Motor speed while intaking. Unit RPS
     final double STOPED_VELOCITY = 0; // Motor speed while stoped. Unit RPS
     final double RPS_TO_TPS = 28;
     //-----------------------------------------
