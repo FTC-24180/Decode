@@ -55,9 +55,10 @@ public class Blue_Side_Far extends LinearOpMode {
 
         //TODO ALL Action builders need position data/tuning
 
-        Action driveToFirstLaunch = drive.actionBuilder(new Pose2d(-16,56.5, Math.toRadians(180)))
-                .strafeTo(new Vector2d(-20, -14))
-                .strafeToLinearHeading(new Vector2d(-32,-20), Math.toRadians(-127))
+        Action driveToFirstLaunch = drive.actionBuilder(new Pose2d(63.75,-16, Math.toRadians(180)))
+//                .strafeTo(new Vector2d(-10, -14))
+//                .strafeToLinearHeading(new Vector2d(-29.25,-14), Math.toRadians(-126))
+                .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-157.5))
                 .build();
 
         Action waitForFlyWheelSpinUp = drive.actionBuilder(drive.localizer.getPose())
@@ -68,7 +69,8 @@ public class Blue_Side_Far extends LinearOpMode {
                 .waitSeconds(2.5)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-32,-20,Math.toRadians(-127)))
+//        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-29.25,-14,Math.toRadians(-126)))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(50, -15, Math.toRadians(-157.5)))
                 .strafeToLinearHeading(new Vector2d(36,-22),Math.toRadians(-90))
                 .build();
 
@@ -77,25 +79,27 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,-74,Math.toRadians(-90)))
-                .strafeTo(new Vector2d(25, -35))
-                .strafeToLinearHeading(new Vector2d(-32,-20), Math.toRadians(-127))
+//                .strafeTo(new Vector2d(25, -35))
+//                .strafeToLinearHeading(new Vector2d(-29.25,-14), Math.toRadians(-126))
+                .strafeToLinearHeading(new Vector2d(50,-15), Math.toRadians(-157.5))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(2.5)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-32,-20, Math.toRadians(-127)))
-                .strafeToLinearHeading(new Vector2d(13.5,-22), Math.toRadians(-90))
+//        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-29.25,-14, Math.toRadians(-126)))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(50,-15, Math.toRadians(-157.5)))
+                .strafeToLinearHeading(new Vector2d(13,-22), Math.toRadians(-90))
                 .build();
 
-        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(13.5,-22, Math.toRadians(-90)))
+        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(13,-22, Math.toRadians(-90)))
                 .lineToY(-75)
                 .build();
 
-        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(13.5,-75, Math.toRadians(-90)))
+        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(13,-75, Math.toRadians(-90)))
                 .strafeTo(new Vector2d(14, -35))
-                .strafeToLinearHeading(new Vector2d(-32,-20), Math.toRadians(-127))
+                .strafeToLinearHeading(new Vector2d(-29.25,-14), Math.toRadians(-126))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
