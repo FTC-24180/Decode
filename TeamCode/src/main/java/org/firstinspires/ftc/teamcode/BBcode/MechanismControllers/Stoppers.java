@@ -15,7 +15,7 @@ public class Stoppers {
     }
     //-----------------------------------------
     // Constants
-    final double TRANSFER_POWER = 0.285;
+    final double TRANSFER_POWER = 0.4;
     final double STOPED_POWER = 0;
 
     //-----------------------------------------
