@@ -7,7 +7,7 @@ import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Launcher;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Stoppers;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Transfer;
 
-@TeleOp (name = "*Main TeleOp")
+@TeleOp (name = "AA Main TeleOp")
 public class Decode_Qualifier1_Teleop extends OpMode {
     Intake intake;
     Launcher launcher;
@@ -15,7 +15,11 @@ public class Decode_Qualifier1_Teleop extends OpMode {
     Transfer transfer;
     MecanumDrivetrain drivetrain;
 
+    double manualLaunchDistance = 52;
+    double distanceOffset = 0;
+
     enum State {
+        LAUNCHING_DYNAMIC,
         LAUNCHING,
         AIMING,
         INTAKING,
@@ -34,11 +38,31 @@ public class Decode_Qualifier1_Teleop extends OpMode {
     @Override
     public void loop() {
         switch (state) {
+            case INTAKING:
+                intake.intakeArtifacts();
+                launcher.setVelocity(manualLaunchDistance);
+                stoppers.stop();
+                transfer.stop();
+                drivetrain.Drive();
+
+                if (gamepad1.right_trigger > 0) {
+                    state = State.LAUNCHING;
+                }
+                if (gamepad1.left_bumper) {
+                    state = State.AIMING;
+                }
+                if (gamepad1.backWasPressed()) {
+                    state = State.SAFE;
+                }
+                break;
             case LAUNCHING:
                 intake.intakeArtifacts();
-                launcher.launch(drivetrain.getDistanceFromGoal());
-                stoppers.transfer();
+                launcher.setVelocity(manualLaunchDistance);
+                if (launcher.launcher.getVelocity() / launcher.launcher.getMotorType().getTicksPerRev() > manualLaunchDistance - 2) {
+                    stoppers.transfer();
+                }
                 transfer.transfer();
+                drivetrain.Drive();
 
                 if (gamepad1.right_trigger == 0) {
                     state = State.INTAKING;
@@ -54,8 +78,8 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                 transfer.stop();
                 drivetrain.Drive();
 
-                if (gamepad1.right_trigger > 0) {
-                    state = State.LAUNCHING;
+                if (gamepad1.rightBumperWasPressed()) {
+                    state = State.LAUNCHING_DYNAMIC;
                 }
                 if (!gamepad1.left_bumper) {
                     state = State.INTAKING;
@@ -64,18 +88,14 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                     state = State.SAFE;
                 }
                 break;
-            case INTAKING:
+            case LAUNCHING_DYNAMIC:
                 intake.intakeArtifacts();
-                launcher.idle();
-                stoppers.stop();
-                transfer.stop();
+                launcher.launch(drivetrain.getDistanceFromGoal() + distanceOffset);
+                stoppers.transfer();
+                transfer.transfer();
                 drivetrain.Drive();
 
-                if (gamepad1.right_trigger > 0) {
-                    state = State.LAUNCHING;
-                }
-
-                if (gamepad1.left_bumper) {
+                if (!gamepad1.right_bumper) {
                     state = State.AIMING;
                 }
                 if (gamepad1.backWasPressed()) {
@@ -93,6 +113,23 @@ public class Decode_Qualifier1_Teleop extends OpMode {
                     state = State.INTAKING;
                 }
                 break;
+        }
+
+        if (gamepad2.yWasPressed()) {
+            manualLaunchDistance = 54;
+        }
+        if (gamepad2.xWasPressed()) {
+            manualLaunchDistance = 52;
+        }
+        if (gamepad2.aWasPressed()) {
+            manualLaunchDistance = 50;
+        }
+
+        if (gamepad2.dpadUpWasPressed()) {
+            distanceOffset += 1;
+        }
+        if (gamepad2.dpadDownWasPressed()) {
+            distanceOffset -= 1;
         }
     }
 }

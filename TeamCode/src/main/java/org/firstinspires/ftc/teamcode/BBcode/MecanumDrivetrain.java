@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
 import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.RedBasketPose;
+import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.ChristmasLight;
 import org.firstinspires.ftc.teamcode.Localizer;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
@@ -27,6 +28,8 @@ public class MecanumDrivetrain {
     DcMotorEx _rightFront;
     DcMotorEx _rightBack;
 
+    ChristmasLight christmasLight;
+
     private static Pose2d previousPose = new Pose2d(0, 0, 0);
     //TODO drop and target pose needs to be set based on start location red vs blue
     private static final Pose2d dropPose = RedBasketPose.drop;
@@ -40,7 +43,6 @@ public class MecanumDrivetrain {
     private static final double kdRotation = 0.1;
     private static final double angleToleranceDeg = 1;
     private static final double distanceToleranceInch = .25;
-    private static final double AIM_DRIVE_SPEED = 1;
     public final Localizer localizer;
     ElapsedTime derivativeTimer;
 
@@ -59,6 +61,8 @@ public class MecanumDrivetrain {
         _leftBack = _opMode.hardwareMap.tryGet(DcMotorEx.class, "leftBack");
         _rightFront = _opMode.hardwareMap.tryGet(DcMotorEx.class, "rightFront");
         _rightBack = _opMode.hardwareMap.tryGet(DcMotorEx.class, "rightBack");
+
+        christmasLight = new ChristmasLight(_opMode);
 
         double[] motorPowers = new double[]{0, 0, 0, 0};
         //For right now, just add a telemetry message but the code will still fail when it's accessed in code so gracefully handle the null case
@@ -95,8 +99,8 @@ public class MecanumDrivetrain {
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        if (PoseStorage.hasFieldCentricDrive) {
-            if (gamepad1.left_trigger > 0) {
+        if (false /*PoseStorage.hasFieldCentricDrive*/) {
+            if (gamepad1.left_bumper) {
                 switch (PoseStorage.alliance) {
                     case RED:
                         goalPosition = new Vector2d(-72,-72);
@@ -105,25 +109,16 @@ public class MecanumDrivetrain {
                         goalPosition = new Vector2d(-72,72);
                         break;
                 }
-                double offestX = localizer.getPose().position.x + goalPosition.x;
-                double offsetY = localizer.getPose().position.y + goalPosition.y;
+                double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+                double yDistance = goalPosition.y - localizer.getPose().position.y;
 
-                double r = Math.sqrt(Math.pow((offestX), 2) + Math.pow((offsetY), 2));
-                double t = Math.toDegrees(Math.atan(offsetY / offestX));
+                double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
 
-                double newR = r + (-gamepad1.left_stick_y * AIM_DRIVE_SPEED);
-                double newT = t + (gamepad1.left_stick_x * AIM_DRIVE_SPEED);
-
-                double newOffestX = newR * Math.cos(newT);
-                double newOffsetY = newR * Math.sin(newT);
-
-                double newX = newOffestX - goalPosition.x;
-                double newY = newOffsetY - goalPosition.y;
-
-                targetPose = new Pose2d(new Vector2d(newX, newY), (-Math.signum(newT) * 180) + newT);
+                targetPose = new Pose2d(localizer.getPose().position, angleToGoal);
 
             }
         }
+
         if (targetPose == null){
             //manual teleop drive
             drive = gamepad1.left_stick_y;
@@ -131,6 +126,9 @@ public class MecanumDrivetrain {
             strafe = gamepad1.left_stick_x * -1;
             if (gamepad1.left_trigger > 0) {
                 speedMultiplier = 0.25;
+            }
+            if (gamepad1.right_trigger > 0 || gamepad1.rightBumperWasPressed()) {
+                speedMultiplier = 0.17;
             }
             fLeftPow = Range.clip((drive + turn + strafe) * speedMultiplier, -1, 1);
             bLeftPow = Range.clip((drive + turn - strafe) * speedMultiplier, -1, 1);
@@ -233,7 +231,7 @@ public class MecanumDrivetrain {
     }
 
     public double getDistanceFromGoal() {
-        if (PoseStorage.hasFieldCentricDrive) {
+        if (true /*PoseStorage.hasFieldCentricDrive*/) {
             switch (PoseStorage.alliance) {
                 case RED:
                     goalPosition = new Vector2d(-72,72);
@@ -246,6 +244,7 @@ public class MecanumDrivetrain {
             double yDistance = Math.abs(goalPosition.y - localizer.getPose().position.y);
             return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
         } else {
+            christmasLight.red();
             return 102;
         }
     }
