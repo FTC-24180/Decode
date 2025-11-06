@@ -47,7 +47,7 @@ public class Red_Side_Far extends LinearOpMode {
 
         //TODO ALL Action builders need position data/tuning
 
-        Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
+        Action driveToFirstLaunch = drive.actionBuilder(new Pose2d(63.75,16, Math.toRadians(180)))
                 .strafeToLinearHeading(new Vector2d(50,15), Math.toRadians(158))
                 .build();
 
@@ -92,9 +92,6 @@ public class Red_Side_Far extends LinearOpMode {
                 .waitSeconds(3)
                 .build();
 
-        Action driveToPark = drive.actionBuilder(new Pose2d(-20,9, Math.toRadians(135)))
-                .strafeToLinearHeading(new Vector2d(0,25), Math.toRadians(90))
-                .build();
 
         //----------------------------------------------------------------------------------------------
 
@@ -126,8 +123,7 @@ public class Red_Side_Far extends LinearOpMode {
                                 driveToThirdLaunch,
                                 _StoppersActions.transfer(),
                                 _TransferActions.Transfering(),
-                                waitForThirdLaunch,
-                                driveToPark
+                                waitForThirdLaunch
                         )
                 )
         );

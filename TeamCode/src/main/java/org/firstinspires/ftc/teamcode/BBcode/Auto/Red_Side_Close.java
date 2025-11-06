@@ -46,7 +46,7 @@ public class Red_Side_Close extends LinearOpMode {
 
         //TODO ALL Action builders need position data/tuning
 
-        Action driveToFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
+        Action driveToFirstLaunch = drive.actionBuilder(new Pose2d(-61.75, 39, Math.toRadians(90)))
                 .strafeToLinearHeading(new Vector2d(-20,9), Math.toRadians(135))
                 .build();
 
