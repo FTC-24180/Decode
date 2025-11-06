@@ -30,9 +30,12 @@ public class Launcher {
 
 
     //-----------------------------------------
+    public double calcLaunchSpeed(double distanceFromGoal) {
+        return (0.000027 * Math.pow(distanceFromGoal, 3)) + (-0.00827 * Math.pow(distanceFromGoal, 2)) + (0.9043 * distanceFromGoal) + 15;
+    }
 
     public void launch(double distanceFromGoal) {
-        double rps = (0.000027 * Math.pow(distanceFromGoal, 3)) + (-0.00827 * Math.pow(distanceFromGoal, 2)) + (0.9043 * distanceFromGoal) + 20.85;
+        double rps = calcLaunchSpeed(distanceFromGoal);
         setVelocity(rps);
     }
     public void shortLaunch() {setVelocity(Short_Launch_Velocity);}

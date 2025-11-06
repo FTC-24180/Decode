@@ -39,7 +39,7 @@ public class MecanumDrivetrain {
     // TODO adjust proportional control gains for tele-auto
     private static final double kpTranslation = 0.07;
     private static final double kdTranslation = 0.01;
-    private static final double kpRotation = .7;
+    private static final double kpRotation = 3;
     private static final double kdRotation = 0.1;
     private static final double angleToleranceDeg = 1;
     private static final double distanceToleranceInch = .25;
@@ -99,7 +99,7 @@ public class MecanumDrivetrain {
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        if (false /*PoseStorage.hasFieldCentricDrive*/) {
+        if (PoseStorage.hasFieldCentricDrive) {
             if (gamepad1.left_bumper) {
                 switch (PoseStorage.alliance) {
                     case RED:
@@ -114,7 +114,7 @@ public class MecanumDrivetrain {
 
                 double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
 
-                targetPose = new Pose2d(localizer.getPose().position, angleToGoal);
+                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal));
 
             }
         }
@@ -231,7 +231,7 @@ public class MecanumDrivetrain {
     }
 
     public double getDistanceFromGoal() {
-        if (true /*PoseStorage.hasFieldCentricDrive*/) {
+        if (PoseStorage.hasFieldCentricDrive) {
             switch (PoseStorage.alliance) {
                 case RED:
                     goalPosition = new Vector2d(-72,72);

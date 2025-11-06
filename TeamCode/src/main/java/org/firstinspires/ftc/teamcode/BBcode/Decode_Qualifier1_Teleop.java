@@ -91,7 +91,9 @@ public class Decode_Qualifier1_Teleop extends OpMode {
             case LAUNCHING_DYNAMIC:
                 intake.intakeArtifacts();
                 launcher.launch(drivetrain.getDistanceFromGoal() + distanceOffset);
-                stoppers.transfer();
+                if (launcher.launcher.getVelocity() / launcher.launcher.getMotorType().getTicksPerRev() > launcher.calcLaunchSpeed(drivetrain.getDistanceFromGoal()) - 2) {
+                    stoppers.transfer();
+                }
                 transfer.transfer();
                 drivetrain.Drive();
 
@@ -116,13 +118,13 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         }
 
         if (gamepad2.yWasPressed()) {
-            manualLaunchDistance = 54;
+            manualLaunchDistance = 49;
         }
         if (gamepad2.xWasPressed()) {
-            manualLaunchDistance = 52;
+            manualLaunchDistance = 47;
         }
         if (gamepad2.aWasPressed()) {
-            manualLaunchDistance = 50;
+            manualLaunchDistance = 42;
         }
 
         if (gamepad2.dpadUpWasPressed()) {
