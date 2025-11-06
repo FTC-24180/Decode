@@ -51,6 +51,8 @@ public class MecanumDrivetrain {
     double lastRobotRelativeY;
     Vector2d goalPosition;
 
+    public double angleOffset = 0;
+
     // Constructor
     public MecanumDrivetrain(OpMode opMode) {
         _opMode = opMode;
@@ -103,10 +105,10 @@ public class MecanumDrivetrain {
             if (gamepad1.left_bumper) {
                 switch (PoseStorage.alliance) {
                     case RED:
-                        goalPosition = new Vector2d(-72,-72);
+                        goalPosition = new Vector2d(-72,72);
                         break;
                     case BLUE:
-                        goalPosition = new Vector2d(-72,72);
+                        goalPosition = new Vector2d(-72,-72);
                         break;
                 }
                 double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
@@ -114,7 +116,7 @@ public class MecanumDrivetrain {
 
                 double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
 
-                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal));
+                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
 
             }
         }

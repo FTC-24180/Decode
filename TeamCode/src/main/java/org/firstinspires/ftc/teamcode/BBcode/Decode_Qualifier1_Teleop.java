@@ -128,10 +128,16 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         }
 
         if (gamepad2.dpadUpWasPressed()) {
-            distanceOffset += 1;
+            distanceOffset += 6;
         }
         if (gamepad2.dpadDownWasPressed()) {
-            distanceOffset -= 1;
+            distanceOffset -= 6;
+        }
+        if (gamepad2.dpadLeftWasPressed()) {
+            drivetrain.angleOffset += 2;
+        }
+        if (gamepad2.dpadRightWasPressed()) {
+            drivetrain.angleOffset -= 2;
         }
     }
 }
