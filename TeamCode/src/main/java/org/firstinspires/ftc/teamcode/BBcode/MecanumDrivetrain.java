@@ -101,21 +101,6 @@ public class MecanumDrivetrain {
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        //calculate goal position and angle to goal
-        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-        double yDistance = goalPosition.y - localizer.getPose().position.y;
-        double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
-        //get current robot heading
-
-        double robotHeadingDeg = Math.toDegrees(localizer.getPose().heading.toDouble());
-        if(robotHeadingDeg >= angleToGoal-2 && robotHeadingDeg <= angleToGoal+2)
-        {
-           christmasLight.green();
-        }
-        else
-        {
-           christmasLight.off();
-        }
         if (PoseStorage.hasFieldCentricDrive) {
             if (gamepad1.left_bumper) {
                 switch (PoseStorage.alliance) {
@@ -126,8 +111,10 @@ public class MecanumDrivetrain {
                         goalPosition = new Vector2d(-72,-72);
                         break;
                 }
+                double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+                double yDistance = goalPosition.y - localizer.getPose().position.y;
 
-
+                double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
 
                 targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
 
