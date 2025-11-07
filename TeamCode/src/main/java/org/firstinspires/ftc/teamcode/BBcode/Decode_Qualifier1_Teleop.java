@@ -39,7 +39,7 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         transfer = new Transfer(this);
         drivetrain = new MecanumDrivetrain(this);
         dashboard = FtcDashboard.getInstance();
-        dashboardTelemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
     }
 
     @Override
@@ -146,10 +146,8 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         if (gamepad2.dpadRightWasPressed()) {
             drivetrain.angleOffset += 2;
         }
-        telemetry.addData("hasFieldCentricDrive", PoseStorage.hasFieldCentricDrive);
+
         telemetry.addData("alliance", PoseStorage.alliance);
-        dashboardTelemetry.addData("aim_absErr_deg", 42);
         telemetry.update();
-        dashboardTelemetry.update();
     }
 }

@@ -23,6 +23,7 @@ import java.util.Locale;
 import java.util.Timer;
 
 public class MecanumDrivetrain {
+    PoseStorage.Alliance _alliance = PoseStorage.alliance;
     private final OpMode _opMode;
     private final Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
     TelemetryHelper _telemetryHelper;
@@ -43,11 +44,7 @@ public class MecanumDrivetrain {
     private static final double angleToleranceDeg = 1;
     private static final double distanceToleranceInch = .25;
 
-    static final double AIM_INDICATOR_TOLERANCE_NEAR_DEG = 4.0;
-    static final double AIM_INDICATOR_TOLERANCE_FAR_DEG = 1.0;
-    static final double NEAREST_SHOOTING_DISTANCE = 20.0; // in inches
-    static final double FARTHEST_SHOOTING_DISTANCE = 120.0; // in
-    static final double AIM_INDICATOR_TARGET_ARCLENGTH = 8.0;
+
     private static final double MIN_AIM_DISTANCE_INCH = 12.0;
     private static final double MAX_AIM_TOLERANCE_DEG = 90.0;
     private static final double MIN_AIM_TOLERANCE_DEG = 2.0;
@@ -55,7 +52,7 @@ public class MecanumDrivetrain {
     double lastHeadingError;
     double lastRobotRelativeX;
     double lastRobotRelativeY;
-    Vector2d goalPosition;
+    Vector2d goalPosition = Field.ALLIANCE_RED_GOAL_POSITION;
 
 
 
@@ -70,6 +67,17 @@ public class MecanumDrivetrain {
 
     // Constructor
     public MecanumDrivetrain(OpMode opMode) {
+        if (_alliance == null) {
+            _alliance = PoseStorage.Alliance.RED;
+        }
+        switch (_alliance) {
+            case RED:
+                goalPosition = Field.ALLIANCE_RED_GOAL_POSITION;
+                break;
+            case BLUE:
+                goalPosition = Field.ALLIANCE_BLUE_GOAL_POSITION;
+                break;
+        }
         _opMode = opMode;
         _telemetryHelper = new TelemetryHelper(opMode);
         localizer = new PinpointLocalizer(_opMode.hardwareMap, MecanumDrive.PARAMS.inPerTick, previousPose);
@@ -119,33 +127,20 @@ public class MecanumDrivetrain {
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
 
-        //PoseStorage.hasFieldCentricDrive
-        if (true /*PoseStorage.hasFieldCentricDrive*/) {
-            //Get goal position based on alliance
-            switch (PoseStorage.alliance) {
-                case RED:
-                    goalPosition = new Vector2d(-72,72);
-                    break;
-                case BLUE:
-                    goalPosition = new Vector2d(-72,-72);
-                    break;
-            }
+        //calculate goal position and angle to goal
+        double robotHeadingDeg = Math.toDegrees(localizer.getPose().heading.toDouble());
+        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+        double yDistance = goalPosition.y - localizer.getPose().position.y;
+        double distanceToGoal = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+        double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
 
-            //calculate goal position and angle to goal
-            double robotHeadingDeg = Math.toDegrees(localizer.getPose().heading.toDouble());
-            double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-            double yDistance = goalPosition.y - localizer.getPose().position.y;
-            double distanceToGoal = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-            double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
-
-            //calculate aiming error and indicate status
-            double aimYawError = angleToGoal - robotHeadingDeg;
-            indicateAimingStatus(aimYawError, distanceToGoal, robotHeadingDeg, angleToGoal);
+        //calculate aiming error and indicate status
+        double aimYawError = angleToGoal - robotHeadingDeg;
+        indicateAimingStatus(aimYawError, distanceToGoal, robotHeadingDeg, angleToGoal);
 
 
-            if (gamepad1.left_bumper) {
-                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
-            }
+        if (gamepad1.left_bumper) {
+            targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
         }
 
         if (targetPose == null){
@@ -260,29 +255,17 @@ public class MecanumDrivetrain {
     }
 
     public double getDistanceFromGoal() {
-        if (PoseStorage.hasFieldCentricDrive) {
-            switch (PoseStorage.alliance) {
-                case RED:
-                    goalPosition = new Vector2d(-72,72);
-                    break;
-                case BLUE:
-                    goalPosition = new Vector2d(-72,-72);
-                    break;
-            }
-            double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-            double yDistance = Math.abs(goalPosition.y - localizer.getPose().position.y);
-            return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-        } else {
-            christmasLight.red();
-            return 102;
-        }
+        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+        double yDistance = Math.abs(goalPosition.y - localizer.getPose().position.y);
+        return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+
     }
     private void indicateAimingStatus(double aimYawError, double distanceToGoal, double robotHeadingDeg, double angleToGoal) {
         double absErr = Math.abs(aimYawError);
 
         // Compute tolerance even if distance is small so we can still report telemetry
         double effectiveDistance = Math.max(distanceToGoal, MIN_AIM_DISTANCE_INCH);
-        double fullToleranceDeg = (AIM_INDICATOR_TARGET_ARCLENGTH / effectiveDistance) * (180.0 / Math.PI);
+        double fullToleranceDeg = (Field.AIM_INDICATOR_TARGET_ARCLENGTH / effectiveDistance) * (180.0 / Math.PI);
         fullToleranceDeg = Math.max(MIN_AIM_TOLERANCE_DEG, Math.min(fullToleranceDeg, MAX_AIM_TOLERANCE_DEG));
         double halfToleranceDeg = fullToleranceDeg / 2.0;
 
@@ -291,9 +274,8 @@ public class MecanumDrivetrain {
         _opMode.telemetry.addData("Aim halfTol (deg)", String.format(Locale.US, "%.2f", halfToleranceDeg));
 
         // FTC Dashboard telemetry
-        dashboardTelemetry.addData("aim_absErr_deg", absErr);
-        dashboardTelemetry.addData("aim_halfTol_deg", halfToleranceDeg);
-        dashboardTelemetry.update();
+        _opMode.telemetry.addData("aim_absErr_deg", absErr);
+        _opMode.telemetry.addData("aim_halfTol_deg", halfToleranceDeg);
 
         // Indicator logic
         if (distanceToGoal <= 0) {
