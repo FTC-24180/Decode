@@ -9,7 +9,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Launcher;
 
 public class LauncherActions {
-    Launcher launcher;
+    public final Launcher launcher;
 
     public LauncherActions(OpMode opMode) {
         launcher = new Launcher(opMode);
@@ -58,27 +58,8 @@ public class LauncherActions {
     public Action telemetryAction = new Action() {
         @Override
         public boolean run(@NonNull TelemetryPacket packet) {
-            double velocity = launcher.launcher.getVelocity();
-            double ticksPerRev = launcher.launcher.getMotorType().getTicksPerRev();
-            double rps = velocity / ticksPerRev;
-
-            packet.put("Launcher Velocity", velocity);
-            packet.put("Launcher RPS", rps);
-            //packet.put("PID Coefficients", String.format("P: %.2f I: %.2f D: %.2f F: %.2f", pidCoeffs.p, pidCoeffs.i, pidCoeffs.d, pidCoeffs.f));
-
+            launcher.addTelemetryData();
             return true;
         }
     };
-//
-//    public class launchAction implements Action {
-//        @Override
-//        public boolean run(@NonNull TelemetryPacket packet) {
-//            launcher.launch();
-//            return false;
-//        }
-//    }
-//
-//    public Action launch() {
-//        return new launchAction();
-//   }
 }

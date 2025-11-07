@@ -57,4 +57,14 @@ public class Launcher {
             launcher.setVelocity(tps);
         }
     }
+    public void addTelemetryData()
+    {
+        double velocity = launcher.getVelocity();
+        double ticksPerRev = launcher.getMotorType().getTicksPerRev();
+        double rps = velocity / ticksPerRev;
+
+        opMode.telemetry.addData("Launcher Velocity", velocity);
+        opMode.telemetry.addData("Launcher RPS", rps);
+        opMode.telemetry.addData("PID Coefficients", String.format("P: %.2f I: %.2f D: %.2f F: %.2f", customCoeffs.p, customCoeffs.i, customCoeffs.d, customCoeffs.f));
+    }
 }

@@ -2,11 +2,15 @@ package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
 import androidx.annotation.NonNull;
 
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -42,6 +46,10 @@ public class Red_Side_Far extends LinearOpMode {
         //Initializes drive
         MecanumDrive drive = new MecanumDrive(hardwareMap, RedSidePose.init_far);
 
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+
+        // Create a MultipleTelemetry object, combining the default telemetry and the dashboard telemetry
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.update();
         waitForStart();
         //----------------------------------------------------------------------------------------------
@@ -114,37 +122,55 @@ public class Red_Side_Far extends LinearOpMode {
         //----------------------------------------------------------------------------------------------
 
         Actions.runBlocking(
-                new ParallelAction(
-                        _LauncherActions.telemetryAction,
-                        new SequentialAction(
-                                _LauncherActions.longLaunch(),
-                                _IntakeAction.intake(),
-                                driveToFirstLaunch,
-                                waitForFlyWheelSpinUp,
-                                _StoppersActions.transfer(),
-                                _TransferActions.Transfering(),
-                                waitForFirstLaunch,
-                                _StoppersActions.stop(),
-                                _TransferActions.NotTransfering(),
-                                driveToSpikeMark,
-                                driveToIntake,
-                                _LauncherActions.mediumLaunch(),
-                                driveToSecondLaunch,
-                                _StoppersActions.transfer(),
-                                _TransferActions.Transfering(),
-                                waitForSecondLaunch,
-                                _StoppersActions.stop(),
-                                _TransferActions.NotTransfering(),
-                                _LauncherActions.mediumLaunch(),
-                                driveToSpikeMarkPark,
-                                driveToIntakeSecond,
-                                driveToThirdLaunch,
-                                _StoppersActions.transfer(),
-                                _TransferActions.Transfering(),
-                                waitForThirdLaunch,
-                                sendDataToPoseStorage
-                        )
+            new RaceAction( //RaceAction to run telemetry in parallel with main sequence but end when main sequence ends
+                new ParallelAction( // Telemetry actions need to run in parallel with the main sequence
+                    // Add continuous telemetry actions from mechanisms first
+                    new InstantAction(_LauncherActions.launcher::addTelemetryData),
+
+                    // This MUST be the last action so that update gets called correctly
+                    new InstantAction(() -> {
+                        //                Pose2d p = drive.localizer.getPose();
+                        //                packet.put("x", p.position.x);
+                        //                packet.put("y", p.position.y);
+                        //                packet.put("headingDeg", Math.toDegrees(p.heading.toDouble()));
+                        //                packet.put("Alliance", "RED");
+                        //                // Optional mechanism data (guard with try/catch if methods may not exist)
+                        //                dashboard.sendTelemetryPacket(packet);
+                        telemetry.addData("Alliance", PoseStorage.alliance);
+                        //TODO any other "standard" telemetry
+
+                        telemetry.update();
+                    })
+                ),
+                new SequentialAction(
+                    _LauncherActions.longLaunch(),
+                    _IntakeAction.intake(),
+                    driveToFirstLaunch,
+                    waitForFlyWheelSpinUp,
+                    _StoppersActions.transfer(),
+                    _TransferActions.Transfering(),
+                    waitForFirstLaunch,
+                    _StoppersActions.stop(),
+                    _TransferActions.NotTransfering(),
+                    driveToSpikeMark,
+                    driveToIntake,
+                    _LauncherActions.mediumLaunch(),
+                    driveToSecondLaunch,
+                    _StoppersActions.transfer(),
+                    _TransferActions.Transfering(),
+                    waitForSecondLaunch,
+                    _StoppersActions.stop(),
+                    _TransferActions.NotTransfering(),
+                    _LauncherActions.mediumLaunch(),
+                    driveToSpikeMarkPark,
+                    driveToIntakeSecond,
+                    driveToThirdLaunch,
+                    _StoppersActions.transfer(),
+                    _TransferActions.Transfering(),
+                    waitForThirdLaunch,
+                    sendDataToPoseStorage
                 )
+            )
         );
     }
 }
