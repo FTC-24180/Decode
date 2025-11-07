@@ -30,7 +30,7 @@ public class MecanumDrivetrain {
 
     ChristmasLight christmasLight;
 
-    private static Pose2d previousPose = new Pose2d(0, 0, 0);
+    private static Pose2d previousPose = PoseStorage.currentPose;
     //TODO drop and target pose needs to be set based on start location red vs blue
     private static final Pose2d dropPose = RedBasketPose.drop;
     private static final Pose2d basketDropTargetPose = new Pose2d(dropPose.position.x+1.5, dropPose.position.y+1.5, dropPose.heading.toDouble());
@@ -129,7 +129,7 @@ public class MecanumDrivetrain {
 
 
 
-                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
+            targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
 
             }
         }

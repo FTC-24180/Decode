@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -48,50 +51,65 @@ public class Red_Side_Far extends LinearOpMode {
         //TODO ALL Action builders need position data/tuning
 
         Action driveToFirstLaunch = drive.actionBuilder(new Pose2d(63.75,16, Math.toRadians(180)))
-                .strafeToLinearHeading(new Vector2d(50,15), Math.toRadians(158))
+//                .strafeTo(new Vector2d(-10, -14))
+//                .strafeToLinearHeading(new Vector2d(-29.25,-14), Math.toRadians(-126))
+                .strafeToLinearHeading(new Vector2d(52,15), Math.toRadians(159))
                 .build();
 
         Action waitForFlyWheelSpinUp = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(2.25)
-                .build();
-
-        Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
 
-        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(50,15,Math.toRadians(158)))
-                .strafeToLinearHeading(new Vector2d(36,32),Math.toRadians(90))
+        Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
+                .waitSeconds(2.5)
                 .build();
 
-        Action driveToIntake = drive.actionBuilder(new Pose2d(36,32,Math.toRadians(90)))
-                .lineToY(74)
+//        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-29.25,-14,Math.toRadians(-126)))
+        Action driveToSpikeMark = drive.actionBuilder(new Pose2d(52, 15, Math.toRadians(159)))
+                .strafeToLinearHeading(new Vector2d(36,22),Math.toRadians(90))
                 .build();
 
-        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,74,Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(50,15), Math.toRadians(158))
+        Action driveToIntake = drive.actionBuilder(new Pose2d(36,22,Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(36,62),Math.toRadians(90))
+                .build();
+
+        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(36,62,Math.toRadians(90)))
+//                .strafeTo(new Vector2d(25, -35))
+//                .strafeToLinearHeading(new Vector2d(-29.25,-14), Math.toRadians(-126))
+                .strafeToLinearHeading(new Vector2d(52,15), Math.toRadians(159))
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
 
-        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(50,15, Math.toRadians(158)))
-                .strafeToLinearHeading(new Vector2d(13.5,30), Math.toRadians(90))
+//        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-29.25,-14, Math.toRadians(-126)))
+        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(52,15, Math.toRadians(159)))
+                .strafeToLinearHeading(new Vector2d(14,22), Math.toRadians(90))
                 .build();
 
-        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(13.5,30, Math.toRadians(90)))
-                .lineToY(74)
+        Action driveToIntakeSecond = drive.actionBuilder(new Pose2d(12,22, Math.toRadians(90)))
+                .strafeToLinearHeading(new Vector2d(14,62),Math.toRadians(90))
                 .build();
 
-        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(13.5,74, Math.toRadians(90)))
-                .strafeToLinearHeading(new Vector2d(10,25), Math.toRadians(90))
-                .strafeToLinearHeading(new Vector2d(-20,9), Math.toRadians(135))
+        Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,62, Math.toRadians(90)))
+                .strafeTo(new Vector2d(14, 35))
+                .strafeToLinearHeading(new Vector2d(-32,15), Math.toRadians(125))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
 
+        Action sendDataToPoseStorage = new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                PoseStorage.alliance = PoseStorage.Alliance.RED;
+                PoseStorage.currentPose = drive.localizer.getPose();
+                PoseStorage.hasFieldCentricDrive = true;
+                return false;
+            }
+        };
 
         //----------------------------------------------------------------------------------------------
 
@@ -123,7 +141,8 @@ public class Red_Side_Far extends LinearOpMode {
                                 driveToThirdLaunch,
                                 _StoppersActions.transfer(),
                                 _TransferActions.Transfering(),
-                                waitForThirdLaunch
+                                waitForThirdLaunch,
+                                sendDataToPoseStorage
                         )
                 )
         );

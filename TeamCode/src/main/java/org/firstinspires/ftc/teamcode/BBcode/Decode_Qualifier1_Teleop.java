@@ -118,13 +118,13 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         }
 
         if (gamepad2.yWasPressed()) {
-            manualLaunchDistance = 49;
+            manualLaunchDistance = 59;
         }
         if (gamepad2.xWasPressed()) {
-            manualLaunchDistance = 47;
+            manualLaunchDistance = 51;
         }
         if (gamepad2.aWasPressed()) {
-            manualLaunchDistance = 42;
+            manualLaunchDistance = 50;
         }
 
         if (gamepad2.dpadUpWasPressed()) {
