@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -92,6 +95,15 @@ public class Red_Side_Far extends LinearOpMode {
                 .waitSeconds(3)
                 .build();
 
+        Action sendDataToPoseStorage = new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                PoseStorage.alliance = PoseStorage.Alliance.RED;
+                PoseStorage.currentPose = drive.localizer.getPose();
+                PoseStorage.hasFieldCentricDrive = true;
+                return false;
+            }
+        };
 
         //----------------------------------------------------------------------------------------------
 
@@ -123,7 +135,8 @@ public class Red_Side_Far extends LinearOpMode {
                                 driveToThirdLaunch,
                                 _StoppersActions.transfer(),
                                 _TransferActions.Transfering(),
-                                waitForThirdLaunch
+                                waitForThirdLaunch,
+                                sendDataToPoseStorage
                         )
                 )
         );

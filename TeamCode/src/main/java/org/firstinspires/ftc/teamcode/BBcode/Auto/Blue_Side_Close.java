@@ -1,6 +1,9 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -90,6 +93,15 @@ public class Blue_Side_Close extends LinearOpMode {
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3.5)
                 .build();
+        Action sendDataToPoseStorage = new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                PoseStorage.alliance = PoseStorage.Alliance.BLUE;
+                PoseStorage.currentPose = drive.localizer.getPose();
+                PoseStorage.hasFieldCentricDrive = true;
+                return false;
+            }
+        };
 
         //----------------------------------------------------------------------------------------------
 
@@ -117,7 +129,8 @@ public class Blue_Side_Close extends LinearOpMode {
                         driveToThirdLaunch,
                         _StoppersActions.transfer(),
                         _TransferActions.Transfering(),
-                        waitForThirdLaunch
+                        waitForThirdLaunch,
+                        sendDataToPoseStorage
                 )
         );
     }

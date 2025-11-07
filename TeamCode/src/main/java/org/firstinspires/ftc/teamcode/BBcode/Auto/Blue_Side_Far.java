@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -105,7 +107,15 @@ public class Blue_Side_Far extends LinearOpMode {
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
-
+        Action sendDataToPoseStorage = new Action() {
+            @Override
+            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+                PoseStorage.alliance = PoseStorage.Alliance.BLUE;
+                PoseStorage.currentPose = drive.localizer.getPose();
+                PoseStorage.hasFieldCentricDrive = true;
+                return false;
+            }
+        };
         //----------------------------------------------------------------------------------------------
 
         Actions.runBlocking(
@@ -135,7 +145,8 @@ public class Blue_Side_Far extends LinearOpMode {
                                 driveToThirdLaunch,
                                 _StoppersActions.transfer(),
                                 _TransferActions.Transfering(),
-                                waitForThirdLaunch
+                                waitForThirdLaunch,
+                                sendDataToPoseStorage
 
                         )
                 )
