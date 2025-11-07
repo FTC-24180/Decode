@@ -1,22 +1,18 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.acmerobotics.dashboard.FtcDashboard;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorEx;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 
 import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.BlueSidePose;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismActionBuilders.IntakeActions;
@@ -30,11 +26,13 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Config
 //@Disabled
 @Autonomous(name = "Blue_Side_Far", group = "Autonomous")
+@SuppressWarnings("unused")
 public class Blue_Side_Far extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         //Initialization steps
+        FtcDashboard dashboard = FtcDashboard.getInstance();
         PoseStorage.previousOpMode = OpModeType.AUTONOMOUS;
 
         //Creates instance of MechanismActionBuilders
@@ -46,10 +44,10 @@ public class Blue_Side_Far extends LinearOpMode {
         //Initializes drive
         MecanumDrive drive = new MecanumDrive(hardwareMap, BlueSidePose.init_far);
 
+        // Create a MultipleTelemetry object, combining the default telemetry and the dashboard telemetry
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.update();
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-        DcMotorEx launcherMotor = hardwareMap.get(DcMotorEx.class, "launcher");
-        PIDFCoefficients pidCoeffs = launcherMotor.getPIDFCoefficients(DcMotor.RunMode.RUN_USING_ENCODER);
+
         waitForStart();
         //----------------------------------------------------------------------------------------------
 
@@ -108,20 +106,35 @@ public class Blue_Side_Far extends LinearOpMode {
                 .waitSeconds(3)
                 .build();
 
-        Action sendDataToPoseStorage = new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                PoseStorage.alliance = PoseStorage.Alliance.BLUE;
-                PoseStorage.currentPose = drive.localizer.getPose();
-                PoseStorage.hasFieldCentricDrive = true;
-                return false;
-            }
+        Action sendDataToPoseStorage = telemetryPacket -> {
+            PoseStorage.alliance = PoseStorage.Alliance.BLUE;
+            PoseStorage.currentPose = drive.localizer.getPose();
+            PoseStorage.hasFieldCentricDrive = true;
+            return false;
         };
         //----------------------------------------------------------------------------------------------
 
         Actions.runBlocking(
-                new ParallelAction(
-                        _LauncherActions.telemetryAction,
+                new RaceAction( //RaceAction to run telemetry in parallel with main sequence but end when main sequence ends
+                        new ParallelAction( // Telemetry actions need to run in parallel with the main sequence
+                                // Add continuous telemetry actions from mechanisms first
+                                new InstantAction(_LauncherActions.launcher::addTelemetryData),
+
+                                // This MUST be the last action so that update gets called correctly
+                                new InstantAction(() -> {
+                                    //                Pose2d p = drive.localizer.getPose();
+                                    //                packet.put("x", p.position.x);
+                                    //                packet.put("y", p.position.y);
+                                    //                packet.put("headingDeg", Math.toDegrees(p.heading.toDouble()));
+                                    //                packet.put("Alliance", "RED");
+                                    //                // Optional mechanism data (guard with try/catch if methods may not exist)
+                                    //                dashboard.sendTelemetryPacket(packet);
+                                    telemetry.addData("Alliance", PoseStorage.alliance);
+                                    //TODO any other "standard" telemetry
+
+                                    telemetry.update();
+                                })
+                        ),
                         new SequentialAction(
                                 _LauncherActions.longLaunch(),
                                 _IntakeAction.intake(),

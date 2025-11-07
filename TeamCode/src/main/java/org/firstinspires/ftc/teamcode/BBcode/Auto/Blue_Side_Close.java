@@ -1,16 +1,17 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
-import androidx.annotation.NonNull;
-
+import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.BlueSidePose;
@@ -25,11 +26,13 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Config
 //@Disabled
 @Autonomous(name = "Blue_Side_Close", group = "Autonomous")
+@SuppressWarnings("unused")
 public class Blue_Side_Close extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         //Initialization steps
+        FtcDashboard dashboard = FtcDashboard.getInstance();
         PoseStorage.previousOpMode = OpModeType.AUTONOMOUS;
 
         //Creates instance of MechanismActionBuilders
@@ -41,6 +44,8 @@ public class Blue_Side_Close extends LinearOpMode {
         //Initializes drive
         MecanumDrive drive = new MecanumDrive(hardwareMap, BlueSidePose.init_close);
 
+        // Create a MultipleTelemetry object, combining the default telemetry and the dashboard telemetry
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.update();
         waitForStart();
         //----------------------------------------------------------------------------------------------
@@ -94,44 +99,62 @@ public class Blue_Side_Close extends LinearOpMode {
                 .waitSeconds(3.5)
                 .build();
 
-        Action sendDataToPoseStorage = new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                PoseStorage.alliance = PoseStorage.Alliance.BLUE;
-                PoseStorage.currentPose = drive.localizer.getPose();
-                PoseStorage.hasFieldCentricDrive = true;
-                return false;
-            }
+        Action sendDataToPoseStorage = telemetryPacket -> {
+            PoseStorage.alliance = PoseStorage.Alliance.BLUE;
+            PoseStorage.currentPose = drive.localizer.getPose();
+            PoseStorage.hasFieldCentricDrive = true;
+            return false;
         };
 
         //----------------------------------------------------------------------------------------------
 
         Actions.runBlocking(
-                new SequentialAction(
-                        _LauncherActions.shortLaunch(),
-                        _IntakeAction.intake(),
-                        driveToFirstLaunch,
-                        waitForFlyWheelSpinUp,
-                        _StoppersActions.transfer(),
-                        _TransferActions.Transfering(),
-                        waitForFirstLaunch,
-                        _StoppersActions.stop(),
-                        _TransferActions.NotTransfering(),
-                        driveToSpikeMark,
-                        driveToIntake,
-                        driveToSecondLaunch,
-                        _StoppersActions.transfer(),
-                        _TransferActions.Transfering(),
-                        waitForSecondLaunch,
-                        _StoppersActions.stop(),
-                        _TransferActions.NotTransfering(),
-                        driveToSpikeMarkPark,
-                        driveToIntakeSecond,
-                        driveToThirdLaunch,
-                        _StoppersActions.transfer(),
-                        _TransferActions.Transfering(),
-                        waitForThirdLaunch,
-                        sendDataToPoseStorage
+                new RaceAction( //RaceAction to run telemetry in parallel with main sequence but end when main sequence ends
+                        new ParallelAction( // Telemetry actions need to run in parallel with the main sequence
+                                // Add continuous telemetry actions from mechanisms first
+                                new InstantAction(_LauncherActions.launcher::addTelemetryData),
+
+                                // This MUST be the last action so that update gets called correctly
+                                new InstantAction(() -> {
+                                    //                Pose2d p = drive.localizer.getPose();
+                                    //                packet.put("x", p.position.x);
+                                    //                packet.put("y", p.position.y);
+                                    //                packet.put("headingDeg", Math.toDegrees(p.heading.toDouble()));
+                                    //                packet.put("Alliance", "RED");
+                                    //                // Optional mechanism data (guard with try/catch if methods may not exist)
+                                    //                dashboard.sendTelemetryPacket(packet);
+                                    telemetry.addData("Alliance", PoseStorage.alliance);
+                                    //TODO any other "standard" telemetry
+
+                                    telemetry.update();
+                                })
+                        ),
+                        new SequentialAction(
+                                _LauncherActions.shortLaunch(),
+                                _IntakeAction.intake(),
+                                driveToFirstLaunch,
+                                waitForFlyWheelSpinUp,
+                                _StoppersActions.transfer(),
+                                _TransferActions.Transfering(),
+                                waitForFirstLaunch,
+                                _StoppersActions.stop(),
+                                _TransferActions.NotTransfering(),
+                                driveToSpikeMark,
+                                driveToIntake,
+                                driveToSecondLaunch,
+                                _StoppersActions.transfer(),
+                                _TransferActions.Transfering(),
+                                waitForSecondLaunch,
+                                _StoppersActions.stop(),
+                                _TransferActions.NotTransfering(),
+                                driveToSpikeMarkPark,
+                                driveToIntakeSecond,
+                                driveToThirdLaunch,
+                                _StoppersActions.transfer(),
+                                _TransferActions.Transfering(),
+                                waitForThirdLaunch,
+                                sendDataToPoseStorage
+                        )
                 )
         );
     }

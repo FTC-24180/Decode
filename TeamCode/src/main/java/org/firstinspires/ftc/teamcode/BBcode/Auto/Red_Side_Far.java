@@ -1,11 +1,8 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
-import androidx.annotation.NonNull;
-
 import com.acmerobotics.dashboard.FtcDashboard;
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
@@ -15,7 +12,6 @@ import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.RedSidePose;
@@ -30,11 +26,13 @@ import org.firstinspires.ftc.teamcode.MecanumDrive;
 @Config
 //@Disabled
 @Autonomous(name = "Red_Side_Far", group = "Autonomous")
+@SuppressWarnings("unused")
 public class Red_Side_Far extends LinearOpMode {
 
     @Override
     public void runOpMode() {
         //Initialization steps
+        FtcDashboard dashboard = FtcDashboard.getInstance();
         PoseStorage.previousOpMode = OpModeType.AUTONOMOUS;
 
         //Creates instance of MechanismActionBuilders
@@ -46,11 +44,10 @@ public class Red_Side_Far extends LinearOpMode {
         //Initializes drive
         MecanumDrive drive = new MecanumDrive(hardwareMap, RedSidePose.init_far);
 
-        FtcDashboard dashboard = FtcDashboard.getInstance();
-
         // Create a MultipleTelemetry object, combining the default telemetry and the dashboard telemetry
         telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
         telemetry.update();
+
         waitForStart();
         //----------------------------------------------------------------------------------------------
 
@@ -109,14 +106,11 @@ public class Red_Side_Far extends LinearOpMode {
                 .waitSeconds(3)
                 .build();
 
-        Action sendDataToPoseStorage = new Action() {
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                PoseStorage.alliance = PoseStorage.Alliance.RED;
-                PoseStorage.currentPose = drive.localizer.getPose();
-                PoseStorage.hasFieldCentricDrive = true;
-                return false;
-            }
+        Action sendDataToPoseStorage = telemetryPacket -> {
+            PoseStorage.alliance = PoseStorage.Alliance.RED;
+            PoseStorage.currentPose = drive.localizer.getPose();
+            PoseStorage.hasFieldCentricDrive = true;
+            return false;
         };
 
         //----------------------------------------------------------------------------------------------
