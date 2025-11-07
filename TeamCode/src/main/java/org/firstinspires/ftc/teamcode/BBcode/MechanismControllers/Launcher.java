@@ -23,7 +23,7 @@ public class Launcher {
     final double STOPPED_VELOCITY = 0;
     final double Short_Launch_Velocity = 53;
     final double Medium_Launch_Velocity = 53;
-    final double Long_Launch_Velocity = 60;
+    final double Long_Launch_Velocity = 59;
     final double RPS_TO_TPS = 28;
 
 

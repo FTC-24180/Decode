@@ -62,14 +62,14 @@ public class Blue_Side_Close extends LinearOpMode {
                 .build();
 
         Action driveToSpikeMark = drive.actionBuilder(new Pose2d(-30,-15,Math.toRadians(-125)))
-                .strafeToLinearHeading(new Vector2d(-14,-23),Math.toRadians(-90))
+                .strafeToLinearHeading(new Vector2d(-14,-22),Math.toRadians(-90))
                 .build();
 
-        Action driveToIntake = drive.actionBuilder(new Pose2d(-14,-23,Math.toRadians(-90)))
-                .strafeToLinearHeading(new Vector2d(-14,-57),Math.toRadians(-90))
+        Action driveToIntake = drive.actionBuilder(new Pose2d(-14,-22,Math.toRadians(-90)))
+                .strafeToLinearHeading(new Vector2d(-14,-55),Math.toRadians(-90))
                 .build();
 
-        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-14,-57,Math.toRadians(-90)))
+        Action driveToSecondLaunch = drive.actionBuilder(new Pose2d(-14,-55,Math.toRadians(-90)))
                 .strafeToLinearHeading(new Vector2d(-30,-15), Math.toRadians(-126))
                 .build();
 
@@ -87,12 +87,13 @@ public class Blue_Side_Close extends LinearOpMode {
 
         Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(12,-62, Math.toRadians(-90)))
                 .strafeTo(new Vector2d(10, -35))
-                .strafeToLinearHeading(new Vector2d(-30,-15), Math.toRadians(-127))
+                .strafeToLinearHeading(new Vector2d(-32,-15), Math.toRadians(-127))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3.5)
                 .build();
+
         Action sendDataToPoseStorage = new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {

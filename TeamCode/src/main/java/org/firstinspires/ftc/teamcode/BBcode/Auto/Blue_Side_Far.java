@@ -67,7 +67,7 @@ public class Blue_Side_Far extends LinearOpMode {
                 .waitSeconds(3)
                 .build();
 
-        Action waitForFarLaunch = drive.actionBuilder(drive.localizer.getPose())
+        Action waitForFirstLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(2.5)
                 .build();
 
@@ -87,7 +87,7 @@ public class Blue_Side_Far extends LinearOpMode {
                 .build();
 
         Action waitForSecondLaunch = drive.actionBuilder(drive.localizer.getPose())
-                .waitSeconds(2.5)
+                .waitSeconds(3)
                 .build();
 
 //        Action driveToSpikeMarkPark = drive.actionBuilder(new Pose2d(-29.25,-14, Math.toRadians(-126)))
@@ -101,12 +101,13 @@ public class Blue_Side_Far extends LinearOpMode {
 
         Action driveToThirdLaunch = drive.actionBuilder(new Pose2d(14,-62, Math.toRadians(-90)))
                 .strafeTo(new Vector2d(14, -35))
-                .strafeToLinearHeading(new Vector2d(-30,-15), Math.toRadians(-126))
+                .strafeToLinearHeading(new Vector2d(-32,-15), Math.toRadians(-125))
                 .build();
 
         Action waitForThirdLaunch = drive.actionBuilder(drive.localizer.getPose())
                 .waitSeconds(3)
                 .build();
+
         Action sendDataToPoseStorage = new Action() {
             @Override
             public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -128,7 +129,7 @@ public class Blue_Side_Far extends LinearOpMode {
                                 waitForFlyWheelSpinUp,
                                 _StoppersActions.transfer(),
                                 _TransferActions.Transfering(),
-                                waitForFarLaunch,
+                                waitForFirstLaunch,
                                 _StoppersActions.stop(),
                                 _TransferActions.NotTransfering(),
                                 driveToSpikeMark,
