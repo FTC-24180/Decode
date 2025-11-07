@@ -1,7 +1,11 @@
 package org.firstinspires.ftc.teamcode.BBcode;
 
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Intake;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Launcher;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.Stoppers;
@@ -14,7 +18,8 @@ public class Decode_Qualifier1_Teleop extends OpMode {
     Stoppers stoppers;
     Transfer transfer;
     MecanumDrivetrain drivetrain;
-
+    FtcDashboard dashboard;
+    Telemetry dashboardTelemetry;
     double manualLaunchDistance = 52;
     double distanceOffset = 0;
 
@@ -33,6 +38,8 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         stoppers = new Stoppers(this);
         transfer = new Transfer(this);
         drivetrain = new MecanumDrivetrain(this);
+        dashboard = FtcDashboard.getInstance();
+        dashboardTelemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
     }
 
     @Override
@@ -139,5 +146,10 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         if (gamepad2.dpadRightWasPressed()) {
             drivetrain.angleOffset += 2;
         }
+        telemetry.addData("hasFieldCentricDrive", PoseStorage.hasFieldCentricDrive);
+        telemetry.addData("alliance", PoseStorage.alliance);
+        dashboardTelemetry.addData("aim_absErr_deg", 42);
+        telemetry.update();
+        dashboardTelemetry.update();
     }
 }

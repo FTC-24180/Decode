@@ -12,6 +12,8 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.RedBasketPose;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.ChristmasLight;
+import com.acmerobotics.dashboard.FtcDashboard;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Localizer;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
@@ -21,21 +23,18 @@ import java.util.Locale;
 import java.util.Timer;
 
 public class MecanumDrivetrain {
-    OpMode _opMode;
+    private final OpMode _opMode;
+    private final Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
     TelemetryHelper _telemetryHelper;
     DcMotorEx _leftFront;
     DcMotorEx _leftBack;
     DcMotorEx _rightFront;
     DcMotorEx _rightBack;
 
-    ChristmasLight christmasLight;
+    private final ChristmasLight christmasLight;
 
-    private static Pose2d previousPose = PoseStorage.currentPose;
+    private static Pose2d previousPose = new Pose2d(0, 0, 0);
     //TODO drop and target pose needs to be set based on start location red vs blue
-    private static final Pose2d dropPose = RedBasketPose.drop;
-    private static final Pose2d basketDropTargetPose = new Pose2d(dropPose.position.x+1.5, dropPose.position.y+1.5, dropPose.heading.toDouble());
-    private static final Pose2d specimenGrabTargetPose = new Pose2d(38,-60, Math.toRadians(0));
-    private static Pose2d specimenClipTargetPose = new Pose2d(0, -36, Math.toRadians(-90));
     // TODO adjust proportional control gains for tele-auto
     private static final double kpTranslation = 0.07;
     private static final double kdTranslation = 0.01;
@@ -43,15 +42,31 @@ public class MecanumDrivetrain {
     private static final double kdRotation = 0.1;
     private static final double angleToleranceDeg = 1;
     private static final double distanceToleranceInch = .25;
-    public final Localizer localizer;
-    ElapsedTime derivativeTimer;
+
+    static final double AIM_INDICATOR_TOLERANCE_NEAR_DEG = 4.0;
+    static final double AIM_INDICATOR_TOLERANCE_FAR_DEG = 1.0;
+    static final double NEAREST_SHOOTING_DISTANCE = 20.0; // in inches
+    static final double FARTHEST_SHOOTING_DISTANCE = 120.0; // in
+    static final double AIM_INDICATOR_TARGET_ARCLENGTH = 8.0;
+    private static final double MIN_AIM_DISTANCE_INCH = 12.0;
+    private static final double MAX_AIM_TOLERANCE_DEG = 90.0;
+    private static final double MIN_AIM_TOLERANCE_DEG = 2.0;
 
     double lastHeadingError;
     double lastRobotRelativeX;
     double lastRobotRelativeY;
     Vector2d goalPosition;
 
+
+
+
+    public final Localizer localizer;
+    ElapsedTime derivativeTimer;
+
+
     public double angleOffset = 0;
+
+
 
     // Constructor
     public MecanumDrivetrain(OpMode opMode) {
@@ -77,6 +92,7 @@ public class MecanumDrivetrain {
             _rightFront.setDirection(DcMotor.Direction.REVERSE);
             _leftBack.setDirection(DcMotor.Direction.REVERSE);
         }
+
         //init derivative timer
         derivativeTimer = new ElapsedTime();
 
@@ -97,40 +113,38 @@ public class MecanumDrivetrain {
         double turnSpeedMultiplier = 0.5;
         double turnEasingExponent = 3, turnEasingYIntercept = 0.05;
 
+
         localizer.update();
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        //calculate goal position and angle to goal
-        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-        double yDistance = goalPosition.y - localizer.getPose().position.y;
-        double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
-        //get current robot heading
 
-        double robotHeadingDeg = Math.toDegrees(localizer.getPose().heading.toDouble());
-        if(robotHeadingDeg >= angleToGoal-2 && robotHeadingDeg <= angleToGoal+2)
-        {
-           christmasLight.green();
-        }
-        else
-        {
-           christmasLight.off();
-        }
-        if (PoseStorage.hasFieldCentricDrive) {
+        //PoseStorage.hasFieldCentricDrive
+        if (true /*PoseStorage.hasFieldCentricDrive*/) {
+            //Get goal position based on alliance
+            switch (PoseStorage.alliance) {
+                case RED:
+                    goalPosition = new Vector2d(-72,72);
+                    break;
+                case BLUE:
+                    goalPosition = new Vector2d(-72,-72);
+                    break;
+            }
+
+            //calculate goal position and angle to goal
+            double robotHeadingDeg = Math.toDegrees(localizer.getPose().heading.toDouble());
+            double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+            double yDistance = goalPosition.y - localizer.getPose().position.y;
+            double distanceToGoal = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
+            double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
+
+            //calculate aiming error and indicate status
+            double aimYawError = angleToGoal - robotHeadingDeg;
+            indicateAimingStatus(aimYawError, distanceToGoal, robotHeadingDeg, angleToGoal);
+
+
             if (gamepad1.left_bumper) {
-                switch (PoseStorage.alliance) {
-                    case RED:
-                        goalPosition = new Vector2d(-72,72);
-                        break;
-                    case BLUE:
-                        goalPosition = new Vector2d(-72,-72);
-                        break;
-                }
-
-
-
-            targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
-
+                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
             }
         }
 
@@ -261,6 +275,42 @@ public class MecanumDrivetrain {
         } else {
             christmasLight.red();
             return 102;
+        }
+    }
+    private void indicateAimingStatus(double aimYawError, double distanceToGoal, double robotHeadingDeg, double angleToGoal) {
+        double absErr = Math.abs(aimYawError);
+
+        // Compute tolerance even if distance is small so we can still report telemetry
+        double effectiveDistance = Math.max(distanceToGoal, MIN_AIM_DISTANCE_INCH);
+        double fullToleranceDeg = (AIM_INDICATOR_TARGET_ARCLENGTH / effectiveDistance) * (180.0 / Math.PI);
+        fullToleranceDeg = Math.max(MIN_AIM_TOLERANCE_DEG, Math.min(fullToleranceDeg, MAX_AIM_TOLERANCE_DEG));
+        double halfToleranceDeg = fullToleranceDeg / 2.0;
+
+        // Regular telemetry
+        _opMode.telemetry.addData("Aim absErr (deg)", String.format(Locale.US, "%.2f", absErr));
+        _opMode.telemetry.addData("Aim halfTol (deg)", String.format(Locale.US, "%.2f", halfToleranceDeg));
+
+        // FTC Dashboard telemetry
+        dashboardTelemetry.addData("aim_absErr_deg", absErr);
+        dashboardTelemetry.addData("aim_halfTol_deg", halfToleranceDeg);
+        dashboardTelemetry.update();
+
+        // Indicator logic
+        if (distanceToGoal <= 0) {
+            christmasLight.off();
+            return;
+        }
+        if (halfToleranceDeg == 0) {
+            christmasLight.off();
+            return;
+        }
+
+        if (absErr <= halfToleranceDeg) {
+            double norm = Range.clip(1.0 - (absErr / halfToleranceDeg), 0.0, 1.0);
+            double aimColorScale = 0.2 + 0.3 * norm; // 0.2..0.5
+            christmasLight.SetColor(aimColorScale);
+        } else {
+            christmasLight.red();
         }
     }
 }
