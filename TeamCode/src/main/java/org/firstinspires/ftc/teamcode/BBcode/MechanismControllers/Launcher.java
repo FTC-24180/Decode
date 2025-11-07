@@ -26,11 +26,20 @@ public class Launcher {
     final double Long_Launch_Velocity = 59;
     final double RPS_TO_TPS = 28;
 
+    public double VelocitySetPointRPS = 0;
+
 
 
 
     //-----------------------------------------
-    public double calcLaunchSpeed(double distanceFromGoal) {
+    /**
+     * Calculates the launch speed based on the distance from the goal.
+     * Uses a cubic polynomial equation to determine the speed.
+     *
+     * @param distanceFromGoal The distance to the goal in inches.
+     * @return The calculated launch speed in revolutions per second (RPS).
+     */
+    public static double calcLaunchSpeed(double distanceFromGoal) {
         return (0.000027 * Math.pow(distanceFromGoal, 3)) + (-0.00827 * Math.pow(distanceFromGoal, 2)) + (0.9043 * distanceFromGoal) + 15;
     }
 
@@ -53,6 +62,7 @@ public class Launcher {
         {
             opMode.telemetry.addLine("Transfer Motor not found!");
         } else {
+            VelocitySetPointRPS = rps;
             double tps = rps * RPS_TO_TPS;
             launcher.setVelocity(tps);
         }
