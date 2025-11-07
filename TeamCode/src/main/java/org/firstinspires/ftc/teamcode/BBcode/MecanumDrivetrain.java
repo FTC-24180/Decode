@@ -30,7 +30,7 @@ public class MecanumDrivetrain {
 
     ChristmasLight christmasLight;
 
-    private static Pose2d previousPose = new Pose2d(0, 0, 0);
+    private static Pose2d previousPose = PoseStorage.currentPose;
     //TODO drop and target pose needs to be set based on start location red vs blue
     private static final Pose2d dropPose = RedBasketPose.drop;
     private static final Pose2d basketDropTargetPose = new Pose2d(dropPose.position.x+1.5, dropPose.position.y+1.5, dropPose.heading.toDouble());
@@ -101,24 +101,23 @@ public class MecanumDrivetrain {
         Gamepad gamepad1 = _opMode.gamepad1;
         previousPose = localizer.getPose();
         Pose2d targetPose = null;
-        if (PoseStorage.hasFieldCentricDrive) {
-            if (gamepad1.left_bumper) {
-                switch (PoseStorage.alliance) {
-                    case RED:
-                        goalPosition = new Vector2d(-72,72);
-                        break;
-                    case BLUE:
-                        goalPosition = new Vector2d(-72,-72);
-                        break;
-                }
-                double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-                double yDistance = goalPosition.y - localizer.getPose().position.y;
 
-                double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
-
-                targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
-
+        if (gamepad1.left_bumper) {
+            switch (PoseStorage.alliance) {
+                case RED:
+                    goalPosition = new Vector2d(-72,72);
+                    break;
+                case BLUE:
+                    goalPosition = new Vector2d(-72,-72);
+                    break;
             }
+            double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+            double yDistance = goalPosition.y - localizer.getPose().position.y;
+
+            double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
+
+            targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
+
         }
 
         if (targetPose == null){
@@ -233,21 +232,16 @@ public class MecanumDrivetrain {
     }
 
     public double getDistanceFromGoal() {
-        if (PoseStorage.hasFieldCentricDrive) {
-            switch (PoseStorage.alliance) {
-                case RED:
-                    goalPosition = new Vector2d(-72,72);
-                    break;
-                case BLUE:
-                    goalPosition = new Vector2d(-72,-72);
-                    break;
-            }
-            double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-            double yDistance = Math.abs(goalPosition.y - localizer.getPose().position.y);
-            return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-        } else {
-            christmasLight.red();
-            return 102;
+        switch (PoseStorage.alliance) {
+            case RED:
+                goalPosition = new Vector2d(-72, 72);
+                break;
+            case BLUE:
+                goalPosition = new Vector2d(-72, -72);
+                break;
         }
+        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+        double yDistance = Math.abs(goalPosition.y - localizer.getPose().position.y);
+        return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
     }
 }
