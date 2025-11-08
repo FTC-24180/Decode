@@ -1,9 +1,11 @@
 package org.firstinspires.ftc.teamcode.BBcode.Auto;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ParallelAction;
 import com.acmerobotics.roadrunner.RaceAction;
 import com.acmerobotics.roadrunner.SequentialAction;
@@ -118,22 +120,19 @@ public class Blue_Side_Far extends LinearOpMode {
                 new RaceAction( //RaceAction to run telemetry in parallel with main sequence but end when main sequence ends
                         new ParallelAction( // Telemetry actions need to run in parallel with the main sequence
                                 // Add continuous telemetry actions from mechanisms first
-                                new InstantAction(_LauncherActions.launcher::addTelemetryData),
+                                _LauncherActions.telemetryAction,
 
                                 // This MUST be the last action so that update gets called correctly
-                                new InstantAction(() -> {
-                                    //                Pose2d p = drive.localizer.getPose();
-                                    //                packet.put("x", p.position.x);
-                                    //                packet.put("y", p.position.y);
-                                    //                packet.put("headingDeg", Math.toDegrees(p.heading.toDouble()));
-                                    //                packet.put("Alliance", "RED");
-                                    //                // Optional mechanism data (guard with try/catch if methods may not exist)
-                                    //                dashboard.sendTelemetryPacket(packet);
-                                    telemetry.addData("Alliance", PoseStorage.alliance);
-                                    //TODO any other "standard" telemetry
-
-                                    telemetry.update();
-                                })
+                                new Action() {
+                                    @Override
+                                    public boolean run(@NonNull TelemetryPacket packet) {
+                                        telemetry.addData("Alliance", PoseStorage.alliance);
+                                        telemetry.addData("Mode", "Blue Side Far");
+                                        //TODO any other "standard" telemetry
+                                        telemetry.update();
+                                        return true; // keep running until sequential part finishes
+                                    }
+                                }
                         ),
                         new SequentialAction(
                                 _LauncherActions.longLaunch(),
