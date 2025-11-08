@@ -34,7 +34,7 @@ public class MecanumDrivetrain {
 
     private final ChristmasLight christmasLight;
 
-    private static Pose2d previousPose = new Pose2d(0, 0, 0);
+    private static Pose2d previousPose = PoseStorage.currentPose;
     //TODO drop and target pose needs to be set based on start location red vs blue
     // TODO adjust proportional control gains for tele-auto
     private static final double kpTranslation = 0.07;
@@ -67,6 +67,7 @@ public class MecanumDrivetrain {
 
     // Constructor
     public MecanumDrivetrain(OpMode opMode) {
+        previousPose = PoseStorage.currentPose; //Update pose in case static field was initialized earlier than expected
         if (_alliance == null) {
             _alliance = PoseStorage.Alliance.RED;
         }
