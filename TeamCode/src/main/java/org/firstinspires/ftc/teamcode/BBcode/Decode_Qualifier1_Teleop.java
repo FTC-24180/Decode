@@ -125,7 +125,7 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         }
 
         if (gamepad2.yWasPressed()) {
-            manualLaunchDistance = 59;
+            manualLaunchDistance = launcher.Long_Launch_Velocity;
         }
         if (gamepad2.xWasPressed()) {
             manualLaunchDistance = 51;
@@ -148,6 +148,7 @@ public class Decode_Qualifier1_Teleop extends OpMode {
         }
 
         telemetry.addData("alliance", PoseStorage.alliance);
+        telemetry.addData("Flywheel RPS setpoint", launcher.VelocitySetPointRPS);
         telemetry.update();
     }
 }
