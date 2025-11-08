@@ -10,22 +10,16 @@ import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-import org.bluebananas.ftc.roadrunneractions.TrajectoryActionBuilders.RedBasketPose;
 import org.firstinspires.ftc.teamcode.BBcode.MechanismControllers.ChristmasLight;
-import com.acmerobotics.dashboard.FtcDashboard;
-import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.teamcode.Localizer;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.PinpointLocalizer;
 
 import java.util.Locale;
 
-import java.util.Timer;
-
 public class MecanumDrivetrain {
     PoseStorage.Alliance _alliance = PoseStorage.alliance;
     private final OpMode _opMode;
-    private final Telemetry dashboardTelemetry = FtcDashboard.getInstance().getTelemetry();
     TelemetryHelper _telemetryHelper;
     DcMotorEx _leftFront;
     DcMotorEx _leftBack;
@@ -34,7 +28,7 @@ public class MecanumDrivetrain {
 
     private final ChristmasLight christmasLight;
 
-    private static Pose2d previousPose = new Pose2d(0, 0, 0);
+    private static Pose2d previousPose = PoseStorage.currentPose;
     //TODO drop and target pose needs to be set based on start location red vs blue
     // TODO adjust proportional control gains for tele-auto
     private static final double kpTranslation = 0.07;
@@ -67,6 +61,7 @@ public class MecanumDrivetrain {
 
     // Constructor
     public MecanumDrivetrain(OpMode opMode) {
+        previousPose = PoseStorage.currentPose; //Update pose in case static field was initialized earlier than expected
         if (_alliance == null) {
             _alliance = PoseStorage.Alliance.RED;
         }
@@ -89,7 +84,6 @@ public class MecanumDrivetrain {
 
         christmasLight = new ChristmasLight(_opMode);
 
-        double[] motorPowers = new double[]{0, 0, 0, 0};
         //For right now, just add a telemetry message but the code will still fail when it's accessed in code so gracefully handle the null case
         //This could be to exit the OpMode or to continue with the OpMode but not use the device. The latter requires checking for null in the code
         if (_leftFront == null || _leftBack == null || _rightFront == null || _rightBack == null)
@@ -129,18 +123,31 @@ public class MecanumDrivetrain {
 
         //calculate goal position and angle to goal
         double robotHeadingDeg = Math.toDegrees(localizer.getPose().heading.toDouble());
-        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
-        double yDistance = goalPosition.y - localizer.getPose().position.y;
-        double distanceToGoal = Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
-        double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
+//        double xDistance = Math.abs(goalPosition.x - localizer.getPose().position.x);
+//        double yDistance = goalPosition.y - localizer.getPose().position.y;
+//        double distanceToGoal = Math.hypot(xDistance, yDistance);
+//        double angleToGoal = Math.toDegrees(Math.atan(xDistance / yDistance)) + (90 * Math.signum(yDistance));
 
-        //calculate aiming error and indicate status
-        double aimYawError = angleToGoal - robotHeadingDeg;
-        indicateAimingStatus(aimYawError, distanceToGoal, robotHeadingDeg, angleToGoal);
+        double dx = goalPosition.x - localizer.getPose().position.x;
+        double dy = goalPosition.y - localizer.getPose().position.y;
+        double distanceToGoal = Math.hypot(dx, dy);
+
+        // Bearing of goal in field frame (0° = +X, CCW+)
+        double angleToGoalDeg = Math.toDegrees(Math.atan2(dy, dx));
+
+
+//        //calculate aiming error and indicate status
+//        double aimYawError = angleToGoal - robotHeadingDeg;
+//        indicateAimingStatus(aimYawError, distanceToGoal, robotHeadingDeg, angleToGoal);
+        // Wrap the aiming error so it is always the shortest rotation
+        double aimYawError = angleWrapDeg(angleToGoalDeg - robotHeadingDeg);
+        indicateAimingStatus(aimYawError, distanceToGoal);
 
 
         if (gamepad1.left_bumper) {
-            targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
+            //targetPose = new Pose2d(localizer.getPose().position, Math.toRadians(angleToGoal + angleOffset));
+            double targetHeadingRad = Math.toRadians(angleWrapDeg(angleToGoalDeg + angleOffset));
+            targetPose = new Pose2d(localizer.getPose().position, targetHeadingRad);
         }
 
         if (targetPose == null){
@@ -207,16 +214,30 @@ public class MecanumDrivetrain {
          * of the robot’s current heading.
          */
         double robotHeading = currentPose.heading.toDouble();
+        double targetHeading = targetPose.heading.toDouble();
+//        double robotRelativeX = errorX * Math.cos(robotHeading) + errorY * Math.sin(robotHeading);
+//        double robotRelativeY = -errorX * Math.sin(robotHeading) + errorY * Math.cos(robotHeading);
+//        robotRelativeY = -robotRelativeY;
+        //double errorYaw = targetPose.heading.toDouble() - robotHeading;
+
+        // Shortest angular error
+        double errorYaw = angleWrapRad(targetHeading - robotHeading);
+
+        // Field -> robot transform
         double robotRelativeX = errorX * Math.cos(robotHeading) + errorY * Math.sin(robotHeading);
         double robotRelativeY = -errorX * Math.sin(robotHeading) + errorY * Math.cos(robotHeading);
         robotRelativeY = -robotRelativeY;
-        double errorYaw = targetPose.heading.toDouble() - robotHeading;
-        //calc derivative
-        double turnDerivative = (errorYaw - lastHeadingError) / derivativeTimer.seconds();
+
+        // Derivatives (guard dt and wrap yaw delta)
+
+        //double turnDerivative = (errorYaw - lastHeadingError) / derivativeTimer.seconds();
+        double dt = Math.max(derivativeTimer.seconds(), 1e-3);
+        double turnDerivative   = angleWrapRad(errorYaw - lastHeadingError) / dt;
         lastHeadingError = errorYaw;
-        double driveDerivative = (robotRelativeX - lastRobotRelativeX) / derivativeTimer.seconds();
+
+        double driveDerivative = (robotRelativeX - lastRobotRelativeX) / dt;
         lastRobotRelativeX = robotRelativeX;
-        double strafeDerivative = (robotRelativeY - lastRobotRelativeY) / derivativeTimer.seconds();
+        double strafeDerivative = (robotRelativeY - lastRobotRelativeY) / dt;
         lastRobotRelativeY = robotRelativeY;
         derivativeTimer.reset();
 
@@ -234,6 +255,7 @@ public class MecanumDrivetrain {
             double leftBackPower = strafe - drive + turn;
             double rightBackPower = strafe + drive + turn;
 
+            // Note: verify these sign flips match your motor directions
             leftFrontPower = -leftFrontPower;
             rightBackPower = -rightBackPower;
             // Normalize wheel powers to be less than 1.0
@@ -260,7 +282,7 @@ public class MecanumDrivetrain {
         return Math.sqrt(Math.pow(xDistance, 2) + Math.pow(yDistance, 2));
 
     }
-    private void indicateAimingStatus(double aimYawError, double distanceToGoal, double robotHeadingDeg, double angleToGoal) {
+    private void indicateAimingStatus(double aimYawError, double distanceToGoal) {
         double absErr = Math.abs(aimYawError);
 
         // Compute tolerance even if distance is small so we can still report telemetry
@@ -294,5 +316,15 @@ public class MecanumDrivetrain {
         } else {
             christmasLight.red();
         }
+    }
+    private static double angleWrapRad(double a) {
+        while (a > Math.PI) a -= 2.0 * Math.PI;
+        while (a <= -Math.PI) a += 2.0 * Math.PI;
+        return a;
+    }
+    private static double angleWrapDeg(double a) {
+        while (a > 180.0) a -= 360.0;
+        while (a <= -180.0) a += 360.0;
+        return a;
     }
 }
