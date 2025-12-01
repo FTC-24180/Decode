@@ -8,8 +8,11 @@ import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
 
+import java.util.Arrays;
 import java.util.List;
 
 /*
@@ -55,6 +58,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
 import org.firstinspires.ftc.robotcore.external.navigation.Pose3D;
+import org.firstinspires.ftc.robotcore.external.navigation.Position;
+import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 import java.util.List;
 
@@ -86,6 +91,15 @@ public class BB_Limelight_Testing extends LinearOpMode {
 
     private Limelight3A limelight;
 
+
+    private double botYaw;
+
+    double aError;
+    double xError;
+    double yError;
+
+    final Pose3D targetPose = new Pose3D(new Position(DistanceUnit.INCH, 52, -15, 0,0), new YawPitchRollAngles(AngleUnit.DEGREES, -159, 0, 0, 0));
+
     @Override
     public void runOpMode() throws InterruptedException
     {
@@ -116,20 +130,20 @@ public class BB_Limelight_Testing extends LinearOpMode {
             LLResult result = limelight.getLatestResult();
             if (result.isValid()) {
                 // Access general information
-                Pose3D botpose = result.getBotpose();
+                Pose3D botPose = result.getBotpose();
                 double captureLatency = result.getCaptureLatency();
                 double targetingLatency = result.getTargetingLatency();
                 double parseLatency = result.getParseLatency();
                 telemetry.addData("LL Latency", captureLatency + targetingLatency);
                 telemetry.addData("Parse Latency", parseLatency);
-                telemetry.addData("PythonOutput", java.util.Arrays.toString(result.getPythonOutput()));
+                telemetry.addData("PythonOutput", Arrays.toString(result.getPythonOutput()));
 
                 telemetry.addData("tx", result.getTx());
                 telemetry.addData("txnc", result.getTxNC());
                 telemetry.addData("ty", result.getTy());
                 telemetry.addData("tync", result.getTyNC());
 
-                telemetry.addData("Botpose", botpose.toString());
+                //telemetry.addData("Botpose", botPose.toString());
 
                 // Access barcode results
                 List<LLResultTypes.BarcodeResult> barcodeResults = result.getBarcodeResults();
@@ -149,6 +163,24 @@ public class BB_Limelight_Testing extends LinearOpMode {
                     telemetry.addData("Detector", "Class: %s, Area: %.2f", dr.getClassName(), dr.getTargetArea());
                 }
 
+                LLResult lLResult = limelight.getLatestResult();
+                if (lLResult != null) {
+                    aError = targetPose.getOrientation().getYaw() - botYaw;
+
+                    if (botPose.getPosition() == null) {
+                        telemetry.addData("botpose pos", "Unavailiable/Null");
+
+                    } else if (targetPose.getPosition() == null) {
+                        telemetry.addData("target Pose.pos", "Null");
+                    }
+
+                    else {
+                        xError = targetPose.getPosition().x - botPose.getPosition().x;
+                        //telemetry.addData();
+                        yError = targetPose.getPosition().y - botPose.getPosition().y;
+                    }
+                }
+
                 // Access fiducial results
                 List<LLResultTypes.FiducialResult> fiducialResults = result.getFiducialResults();
                 for (LLResultTypes.FiducialResult fr : fiducialResults) {
@@ -162,6 +194,13 @@ public class BB_Limelight_Testing extends LinearOpMode {
                     if (id==24) {
                         telemetry.addData("Goal Color","Red");
                     }
+                    if (Math.abs(fr.getTargetXDegrees())<=1 && !gamepad1.isRumbling())
+                    {
+                        gamepad1.rumble(500);
+                    } else {
+                        gamepad1.stopRumble();
+                    }
+
                 }
 
                 // Access color results
